@@ -1,3 +1,4 @@
+# informations rentrées par l'utilisateur
 longueur_corde = 10  # en mètres
 poids_grimpeur = 70  # en kilogrammes
 hauteur_chute = 5  # en mètres
