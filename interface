@@ -1,0 +1,49 @@
+# Importation du module Tkinter
+from tkinter import *
+ # fenetre principale
+fenetre = Tk()
+fenetre.title('Chute en escalade')
+ # Définition de la taille et de la couleur de fond
+fenetre.geometry("1100x700")
+fenetre.configure(bg = 'grey')
+
+#Création d'un bouton quitter
+btQuit = Button(fenetre, text ='Quitter', command = fenetre.destroy)
+
+btQuit.pack(side=LEFT, padx = 10, pady = 10)
+
+ # Création d'un widget Spinbox
+ 
+ # Création d'une zone de texte pour déterminer la masse
+zoneTexte = Label(fenetre, text = 'Quelle est la masse du grimpeur')
+
+Valeur = StringVar()
+Valeur.set(60)
+choixmasse = Spinbox(fenetre,from_ =20,to = 150, increment = 0.5, width = 5)
+ 
+
+# Création d'une zone de texte pour déterminer la longueur de la corde
+zoneTexte1 = Label(fenetre, text = 'Quelle est la longueur de la corde')
+Valeur1 = StringVar()
+Valeur1.set(60)
+longueurcorde = Spinbox(fenetre,from_ =25,to = 100, increment = 0.5, width = 5)
+
+
+ # Définition des actions de certains widgets
+def processClic():
+    masse = float(choixmasse.get())  # Récupère la masse du grimpeur
+    longueur = float(longueurcorde.get())  # Récupère la longueur de la corde
+    
+#Création d'un bouton Démarrer
+boutonDemarrer = Button( text = 'Démarrer la simulation!', command = processClic)
+
+
+# Placement des éléments dans la fenêtre principale
+zoneTexte.pack()
+choixmasse.pack()
+zoneTexte1.pack()
+longueurcorde.pack()
+boutonDemarrer.pack()
+
+# Boucle sur les événements liées à la fenêtre principale
+fenetre.mainloop()
