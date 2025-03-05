@@ -28,6 +28,29 @@ def facteur(h,L):      #facteur de chute: rapport de la hauteur de la chute par 
     F=(2*m*g*Y*S*h/L)**(1/2)   #formule approchée de la résultante des forces appliquée sur le grimpeur
     if F>12000:              #si la force dépasse 12kN, la corde risque de céder
         indic="en danger"
+
+def fonction(m,h,l,L):
+    y=h
+    g=9.81
+    a=4000
+    vy=0
+    dt=0.001
+    i=0
+    t=0
+    l=(2*m*g*h*L/a)**(1/2)
+    while y>-l:
+        if y>0:
+            vy=vy-g*dt
+            y=y+vy*dt
+            i=i+1
+            t=t+dt
+        else:
+            vy=vy+(-g+force(m,h,L))*dt
+            y=y+vy*dt
+            i=i+1
+            t=t+dt
+    plt.plot(t,y)
+    
     else:
         indic="en sécurité"
     return (F,indic)
