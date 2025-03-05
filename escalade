@@ -1,0 +1,33 @@
+from math import*
+from matplotlib import*
+
+def force(m,h,L):            #force appliquée sur le grimpeur pour une corde "moyenne" en fonction de sa masse, la hauteur de sa chute et la longueur de la corde qui le rattrappe
+    g=9.81
+    a=40000                  #facteur de résistance d'une corde "moyenne"
+    indic=""
+    F=(2*m*g*a*h/L)**(1/2)   #formule approchée de la résultante des forces appliquée sur le grimpeur
+    if F>12000:              #si la force dépasse 12kN, la corde risque de céder
+        indic="en danger"
+    else:
+        indic="en sécurité"
+    return (F,indic)
+
+def facteur(h,L):      #facteur de chute: rapport de la hauteur de la chute par la longueur de corde pour le rattrapper
+    f=h/L
+    return(f)
+
+
+
+
+
+
+
+    def force2(m,h,L,S,Y):            #force appliquée sur le grimpeur pour une corde choisie en fonction de sa masse, la hauteur de sa chute et la longueur de la corde qui le rattrappe
+    g=9.81                        #Y est le module d'Young de la corde, S est sa section
+    indic=""
+    F=(2*m*g*Y*S*h/L)**(1/2)   #formule approchée de la résultante des forces appliquée sur le grimpeur
+    if F>12000:              #si la force dépasse 12kN, la corde risque de céder
+        indic="en danger"
+    else:
+        indic="en sécurité"
+    return (F,indic)
