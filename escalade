@@ -12,6 +12,9 @@ def force(m,h,L):            #force appliquée sur le grimpeur pour une corde "m
         indic="en sécurité"
     return (F,indic)
 
+
+
+
 def facteur(h,L):      #facteur de chute: rapport de la hauteur de la chute par la longueur de corde pour le rattrapper
     f=h/L
     return(f)
@@ -28,29 +31,43 @@ def facteur(h,L):      #facteur de chute: rapport de la hauteur de la chute par 
     F=(2*m*g*Y*S*h/L)**(1/2)   #formule approchée de la résultante des forces appliquée sur le grimpeur
     if F>12000:              #si la force dépasse 12kN, la corde risque de céder
         indic="en danger"
-
-def fonction(m,h,l,L):
-    y=h
-    g=9.81
-    a=4000
-    vy=0
-    dt=0.001
-    i=0
-    t=0
-    l=(2*m*g*h*L/a)**(1/2)
-    while y>-l:
-        if y>0:
-            vy=vy-g*dt
-            y=y+vy*dt
-            i=i+1
-            t=t+dt
-        else:
-            vy=vy+(-g+force(m,h,L))*dt
-            y=y+vy*dt
-            i=i+1
-            t=t+dt
-    plt.plot(t,y)
-    
-    else:
+     else:
         indic="en sécurité"
     return (F,indic)
+
+
+
+
+
+def fonction(m,h,L):                       #permet de tracer la vitesse et la position en f du temps
+    y=h                                    #on définit les différentes constantes et conditions initiales
+    g=9.81
+    a=40000
+    vy=0
+    dt=0.001
+    t=0
+    dl=(2*m*g*h*L/a)**(1/2)               #longueur d'étirement maximal de la corde
+    L1=[]                                 #listes qui vont accueillir les valeurs de vy, de y et de t
+    L2=[]
+    L3=[]
+
+    while t<15:                           
+        if y>0:                          #si y>0, la corde d'applique pas de force de rappel, c'est une chute libre       
+            vy=vy-g*dt
+            y=y+vy*dt
+            t=t+dt
+            L1.append(vy)
+            L2.append(y)
+            L3.append(t)
+            
+        if y<0:                          #si y<0, il y a le poids et le rappel de la corde
+            vy=vy+(-g-a*y/(L*m))*dt
+            y=y+vy*dt
+            t=t+dt
+            L1.append(vy)
+            L2.append(y)
+            L3.append(t)
+    plt.plot(L3,L1)
+    plt.plot(L3,L2)
+    
+    
