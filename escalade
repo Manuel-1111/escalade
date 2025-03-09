@@ -1,5 +1,7 @@
 from math import*
 from matplotlib import*
+import numpy as np
+import matplotlib.pyplot as plt
 
 def force(m,h,L):            #force appliquée sur le grimpeur pour une corde "moyenne" en fonction de sa masse, la hauteur de sa chute et la longueur de la corde qui le rattrappe
     g=9.81
@@ -69,5 +71,24 @@ def fonction(m,h,L):                       #permet de tracer la vitesse et la po
             L3.append(t)
     plt.plot(L3,L1)
     plt.plot(L3,L2)
+
+def elasticite(m,e): # constante elastique de la corde avec e le coef elastique de la corde 
+    k=m/e
+    return(k)
+
+# Simulation du mouvement (oscillation après la chute)
+    t = np.linspace(0, 5, 100)
+    displacement = h * np.cos(np.sqrt(elasticite(m,e)) * t) * np.exp(-0.3 * t)  # Amortissement approximatif
     
+    plt.plot(L3,L1)
+    plt.plot(L3,L2)
+    # Affichage du graphe
+    plt.figure(figsize=(8, 5))
+    plt.plot(t, displacement, label="Mouvement après chute")
+    plt.axhline(0, color='r', linestyle='--', label="Point d'arrêt")
+    plt.xlabel("Temps (s)")
+    plt.ylabel("Position (m)")
+    plt.title("Simulation de chute en escalade")
+    plt.legend()
+    plt.show()
     
