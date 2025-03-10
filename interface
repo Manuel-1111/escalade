@@ -1,32 +1,42 @@
 # Importation du module Tkinter
-from tkinter import *
- # fenetre principale
-fenetre = Tk()
-fenetre.title('Chute en escalade')
- # Définition de la taille et de la couleur de fond
-fenetre.geometry("1100x700")
-fenetre.configure(bg = 'grey')
+import tkinter as tk
+ # fenetre principale, création d'une machine plus complet qu'une simple fentre d'ouverture
+
+Hauteur,Largeur = 800,800
+root = tk.Tk() ## crée une machine sur laquelle on peut placer plusieurs canvas
+root.title("Cercle")
+Dessin = tk.Canvas(root,height=Hauteur,width=Largeur,bg='white')
+Dessin.pack()
+
+# definition du disque correspondant au grimpeur
+
+def disque(x,y,rayon,couleur): ## caractéristique du disque
+    p1 = (x-rayon,y-rayon)
+    p2 = (x+rayon,y+rayon)
+    Dessin.create_oval(p1,p2,width=0,fill=couleur)
+disque(150,225,50,'red')
+
 
 #Création d'un bouton quitter
-btQuit = Button(fenetre, text ='Quitter', command = fenetre.destroy)
+btQuit = tk.Button(root, text ='Quitter', command = root.destroy)
 
-btQuit.pack(side=LEFT, padx = 10, pady = 10)
+btQuit.pack(side=tk.LEFT, padx = 10, pady = 10)
 
  # Création d'un widget Spinbox
  
  # Création d'une zone de texte pour déterminer la masse
-zoneTexte = Label(fenetre, text = 'Quelle est la masse du grimpeur')
+zoneTexte = tk.Label(root, text = 'Quelle est la masse du grimpeur')
 
-Valeur = StringVar()
+Valeur = tk.StringVar()
 Valeur.set(60)
-choixmasse = Spinbox(fenetre,from_ =20,to = 150, increment = 0.5, width = 5)
+choixmasse = tk.Spinbox(root,from_ =20,to = 150, increment = 0.5, width = 5)
  
 
 # Création d'une zone de texte pour déterminer la longueur de la corde
-zoneTexte1 = Label(fenetre, text = 'Quelle est la longueur de la corde')
-Valeur1 = StringVar()
+zoneTexte1 = tk.Label(root, text = 'Quelle est la longueur de la corde')
+Valeur1 = tk.StringVar()
 Valeur1.set(60)
-longueurcorde = Spinbox(fenetre,from_ =25,to = 100, increment = 0.5, width = 5)
+longueurcorde = tk.Spinbox(root,from_ =25,to = 100, increment = 0.5, width = 5)
 
 
  # Définition des actions de certains widgets
@@ -35,7 +45,7 @@ def processClic():
     longueur = float(longueurcorde.get())  # Récupère la longueur de la corde
     
 #Création d'un bouton Démarrer
-boutonDemarrer = Button( text = 'Démarrer la simulation!', command = processClic)
+boutonDemarrer = tk.Button( text = 'Démarrer la simulation!', command = processClic)
 
 
 # Placement des éléments dans la fenêtre principale
@@ -46,4 +56,4 @@ longueurcorde.pack()
 boutonDemarrer.pack()
 
 # Boucle sur les événements liées à la fenêtre principale
-fenetre.mainloop()
+root.mainloop()
