@@ -1,0 +1,53 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+
+# Demande à l'utilisateur les paramètres de la chute
+longueur_corde = float(input("Entrez la longueur de la corde (m) : "))
+poids_grimpeur = float(input("Entrez le poids du grimpeur (kg) : "))
+
+gravite = 9.81  # Accélération due à la gravité (m/s^2)
+coef_elasticite = max(0.1, 1 - (poids_grimpeur / 100))  # Plus le grimpeur est lourd, moins la corde rebondit
+temps_total = 3  # Durée totale de l'animation (s)
+n_frames = 100  # Nombre de frames dans l'animation
+dt = temps_total / n_frames  # Intervalle de temps entre chaque frame
+
+# Positions du grimpeur au fil du temps
+temps = np.linspace(0, temps_total, n_frames)
+y_positions = []
+vitesse = 0
+y = 0
+
+for t in temps:
+    if y < longueur_corde:
+        vitesse += gravite * dt
+        y += vitesse * dt
+    else:
+        vitesse = -vitesse * coef_elasticite  # Simulation de l'effet de rebond de la corde
+        y += vitesse * dt
+    y_positions.append(y)
+
+# Création de la figure
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(6, 8))
+
+# Graphique de la position en fonction du temps
+ax1.plot(temps, y_positions, label="Chute du grimpeur")
+ax1.set_xlabel("Temps (s)")
+ax1.set_ylabel("Position verticale (m)")
+ax1.set_title("Évolution de la chute en fonction du temps")
+ax1.legend()
+ax1.grid()
+
+# Animation de la chute
+ax2.set_xlim(-1, 1)
+ax2.set_ylim(-1, max(y_positions) + 1)
+point, = ax2.plot(0, y_positions[0], 'ro', markersize=10)
+
+# Fonction de mise à jour pour l'animation
+def update(frame):
+    point.set_ydata(y_positions[frame])
+    return point,
+
+ani = animation.FuncAnimation(fig, update, frames=n_frames, interval=dt * 1000, blit=True)
+plt.tight_layout()
+plt.show()
