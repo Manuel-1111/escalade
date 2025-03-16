@@ -1,0 +1,39 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Paramètres de la simulation
+g = 9.81  # accélération due à la gravité (m/s^2)
+t_final = 5.0  # temps final de la simulation (s)
+dt = 0.001  # pas de temps (s)
+r=0,6 # taille du corps 
+
+# Conditions initiales
+t = 0.0  # temps initial (s)
+y0 = 20.0  # hauteur initiale (m)
+v = 0.0  # vitesse initiale (m/s)
+
+# Listes pour stocker les valeurs de temps et de position
+temps = [t]
+positions = [y0]
+
+# Boucle principale de la simulation
+while y0 > 0: # boucle tant que la particule n'a pas touché le sol 
+    # Mettre à jour la vitesse et la position en utilisant la méthode d'Euler
+    v = v - g * dt
+    y0 = y0 + v * dt
+
+    # Mettre à jour le temps
+    t = t + dt
+
+    # Ajouter les nouvelles valeurs à nos listes
+    temps.append(t)
+    positions.append(y0)
+
+# Tracer la position en fonction du temps
+plt.figure()
+plt.plot(temps, positions)
+plt.xlabel('Temps (s)')
+plt.ylabel('Position (m)')
+plt.title('Evolution d\'une particule en chute libre')
+plt.grid(True)
+plt.show
