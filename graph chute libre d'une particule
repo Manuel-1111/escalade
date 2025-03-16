@@ -37,3 +37,66 @@ plt.ylabel('Position (m)')
 plt.title('Evolution d\'une particule en chute libre')
 plt.grid(True)
 plt.show
+
+# autre methode avec en plus une interface sur Thinker 
+import numpy as np
+import tkinter as tk
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib.animation as animation
+
+# Fonction pour démarrer l'animation
+def start_animation():
+    longueur_corde = float(entry_corde.get())
+    poids_grimpeur = float(entry_poids.get())
+    
+    gravite = 9.81  # Accélération due à la gravité (m/s^2)
+    temps_total = 3  # Durée totale de l'animation (s)
+    n_frames = 100  # Nombre de frames dans l'animation
+    dt = temps_total / n_frames  # Intervalle de temps entre chaque frame
+
+    # Calcul des positions
+    temps = np.linspace(0, temps_total, n_frames)
+    y_positions = []
+    vitesse, y = 0, 0
+
+    for t in temps:
+        if y > 0:
+            vitesse += gravite * dt
+            y += vitesse * dt
+        else:
+            vitesse = -vitesse * 0.5  # Simulation de l'effet d'amortissement
+            y += vitesse * dt
+        y_positions.append(y)
+
+    # Mise à jour du graphique
+    ax.clear()
+    ax.plot(temps, y_positions, label="Chute du grimpeur")
+    ax.set_xlabel("Temps (s)")
+    ax.set_ylabel("Position (m)")
+    ax.legend()
+    canvas.draw()
+
+# Création de l'interface Tkinter
+root = tk.Tk()
+root.title("Simulation de chute en escalade")
+
+tk.Label(root, text="Longueur de la corde (m) :").pack()
+entry_corde = tk.Entry(root)
+entry_corde.pack()
+entry_corde.insert(0, "5")
+
+tk.Label(root, text="Poids du grimpeur (kg) :").pack()
+entry_poids = tk.Entry(root)
+entry_poids.pack()
+entry_poids.insert(0, "70")
+
+tk.Button(root, text="Lancer la simulation", command=start_animation).pack()
+
+# Création de la figure Matplotlib
+fig, ax = plt.subplots()
+canvas = FigureCanvasTkAgg(fig, master=root)
+canvas.get_tk_widget().pack()
+
+root.mainloop()
+
