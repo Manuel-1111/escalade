@@ -1,0 +1,86 @@
+import numpy as np
+import tkinter as tk
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib.animation as animation
+
+def start_animation(ax, canvas, ax_anim):
+    longueur_corde = float(longueurcorde.get())
+    poids_grimpeur = float(choixmasse.get())
+    gravite = 9.81
+    temps_total = 3
+    n_frames = 100
+    dt = temps_total / n_frames
+    coef_elasticite = max(0.1, 1 - (poids_grimpeur / 100))
+
+    temps = np.linspace(0, temps_total, n_frames)
+    y_positions_grimpeur = []
+    vitesse_grimpeur = 0
+    y_grimpeur = longueur_corde  # Le grimpeur commence à la hauteur de la corde
+
+    for t in temps:
+        if y_grimpeur > 0:
+            vitesse_grimpeur += gravite * dt
+            y_grimpeur -= vitesse_grimpeur * dt  # Le grimpeur tombe vers le bas
+            if y_grimpeur < 0:
+                y_grimpeur = 0  # Le grimpeur s'arrête au sol
+                vitesse_grimpeur = 0
+        else:
+            vitesse_grimpeur = -vitesse_grimpeur * coef_elasticite
+            y_grimpeur -= vitesse_grimpeur * dt
+
+        # Assurez-vous que le grimpeur ne descend pas en dessous de la longueur de la corde
+        if y_grimpeur < 0:
+            y_grimpeur = 0
+            vitesse_grimpeur = 0
+
+        y_positions_grimpeur.append(y_grimpeur)
+
+    ax.clear()
+    ax.plot(temps, y_positions_grimpeur, label="Chute du grimpeur")
+    ax.set_xlabel("Temps (s)")
+    ax.set_ylabel("Position (m)")
+    ax.legend()
+    ax.set_ylim(0, longueur_corde)  # Assurez-vous que l'axe y montre toute la chute
+    canvas.draw()
+
+    ax_anim.clear()
+    ax_anim.set_xlim(0, 10)
+    ax_anim.set_ylim(0, longueur_corde)  # Assurez-vous que l'axe y montre toute la chute
+    grimpeur, = ax_anim.plot([], [], 'bo', markersize=10, label="Grimpeur")
+    assureur, = ax_anim.plot([5], [0], 'ro', markersize=10, label="Assureur")  # Position fixe de l'assureur
+    ax_anim.legend()
+
+    def update(frame):
+        grimpeur.set_data([5], [y_positions_grimpeur[frame]])
+        return grimpeur, assureur
+
+    ani = animation.FuncAnimation(fig_anim, update, frames=n_frames, interval=temps_total * 1000 / n_frames, blit=True)
+    canvas_anim.draw()
+
+root = tk.Tk()
+root.title("Simulation de chute en escalade")
+
+tk.Label(root, text='Masse du grimpeur (kg)').pack()
+choixmasse = tk.Spinbox(root, from_=50, to=150, increment=0.5, width=5)
+choixmasse.pack()
+
+tk.Label(root, text='Longueur de la corde (m)').pack()
+longueurcorde = tk.Spinbox(root, from_=25, to=100, increment=0.5, width=5)
+longueurcorde.pack()
+
+btLancer = tk.Button(root, text="Lancer la simulation", command=lambda: start_animation(ax, canvas, ax_anim))
+btLancer.pack()
+
+fig, ax = plt.subplots()
+canvas = FigureCanvasTkAgg(fig, master=root)
+canvas.get_tk_widget().pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
+
+fig_anim, ax_anim = plt.subplots()
+canvas_anim = FigureCanvasTkAgg(fig_anim, master=root)
+canvas_anim.get_tk_widget().pack(side=tk.RIGHT, fill=tk.BOTH, expand=1)
+
+btQuit = tk.Button(root, text='Quitter', command=root.destroy)
+btQuit.pack(side=tk.LEFT, padx=10, pady=10)
+
+root.mainloop()
