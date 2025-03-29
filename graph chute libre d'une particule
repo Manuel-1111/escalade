@@ -1,5 +1,5 @@
 
-#autre méthode avec une interface thinker
+# méthode avec une interface thinker
 import numpy as np
 import tkinter as tk
 import matplotlib.pyplot as plt
