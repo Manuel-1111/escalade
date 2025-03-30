@@ -1,4 +1,4 @@
-#CODE AVEC LE GRIMPEUR QUI DISPARAIT
+#CODE AVEC LE GRIMPEUR QUI DISPARAIT MDRR
 import numpy as np
 import tkinter as tk
 import matplotlib.pyplot as plt
@@ -32,7 +32,7 @@ def start_animation(ax, canvas, ax_anim): # axe du graphique et axe de l'animati
             vitesse_grimpeur = -vitesse_grimpeur * coef_elasticite
             y_grimpeur -= vitesse_grimpeur * dt
 
-        # Assurez-vous que le grimpeur ne descend pas en dessous de la longueur de la corde
+        # Assurage que le grimpeur ne descend pas en dessous de la longueur de la corde
         if y_grimpeur < 0:
             y_grimpeur = 0
             vitesse_grimpeur = 0
