@@ -1,23 +1,26 @@
+#CODE AVEC LE GRIMPEUR QUI DISPARAIT
 import numpy as np
 import tkinter as tk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.animation as animation
 
-def start_animation(ax, canvas, ax_anim):
+def start_animation(ax, canvas, ax_anim): # axe du graphique et axe de l'animation
+    #Initialisation des paramètres
     longueur_corde = float(longueurcorde.get())
     poids_grimpeur = float(choixmasse.get())
     gravite = 9.81
-    temps_total = 3
+    temps_total = 4
     n_frames = 100
     dt = temps_total / n_frames
     coef_elasticite = max(0.1, 1 - (poids_grimpeur / 100))
 
+    #Initialisation des variables pour la simulation
     temps = np.linspace(0, temps_total, n_frames)
-    y_positions_grimpeur = []
+    y_positions_grimpeur = [] ## liste qui va stocker la position
     vitesse_grimpeur = 0
     y_grimpeur = longueur_corde  # Le grimpeur commence à la hauteur de la corde
-
+    #Boucle de calcul de la position du grimpeur
     for t in temps:
         if y_grimpeur > 0:
             vitesse_grimpeur += gravite * dt
@@ -36,42 +39,45 @@ def start_animation(ax, canvas, ax_anim):
 
         y_positions_grimpeur.append(y_grimpeur)
 
+    #mise à jour du graphique
     ax.clear()
     ax.plot(temps, y_positions_grimpeur, label="Chute du grimpeur")
     ax.set_xlabel("Temps (s)")
     ax.set_ylabel("Position (m)")
     ax.legend()
-    ax.set_ylim(0, longueur_corde)  # Assurez-vous que l'axe y montre toute la chute
-    canvas.draw()
-
+    ax.set_ylim(0, longueur_corde)  # Assurage que l'axe y montre toute la chute
+    canvas.draw() ##redessine le graphique sur le canevas
+    #Configuration de l'animation pour le grimpeur
     ax_anim.clear()
-    ax_anim.set_xlim(0, 10)
+    ax_anim.set_xlim(0, 10) #axxes limites pour l'animation
     ax_anim.set_ylim(0, longueur_corde)  # Assurez-vous que l'axe y montre toute la chute
-    grimpeur, = ax_anim.plot([], [], 'bo', markersize=10, label="Grimpeur")
+    grimpeur, = ax_anim.plot([], [], 'bo', markersize=10, label="Grimpeur")#création du grimpeur
     assureur, = ax_anim.plot([5], [0], 'ro', markersize=10, label="Assureur")  # Position fixe de l'assureur
     ax_anim.legend()
-
+    #Mise à jour de l'animation
     def update(frame):
-        grimpeur.set_data([5], [y_positions_grimpeur[frame]])
+        if y_positions_grimpeur[frame] <= 0:#Si la position du grimpeur est inférieure ou égale à 0 (sol), l'animation s'arrête.
+            ani.event_source.stop()  # Arrête l'animation lorsque le grimpeur touche le sol
+        grimpeur.set_data([5], [max(y_positions_grimpeur[frame], 0)])  # Actualise la poition du grimpeur et Fixe la position à 0 si elle est négative
         return grimpeur, assureur
-
+    #Paramètrage del'animation
     ani = animation.FuncAnimation(fig_anim, update, frames=n_frames, interval=temps_total * 1000 / n_frames, blit=True)
-    canvas_anim.draw()
-
+    canvas_anim.draw() #Crée une animation en appelant la fonction update à chaque frame.
+#Initialisation de la fenêtre Tkibnter
 root = tk.Tk()
 root.title("Simulation de chute en escalade")
 
 tk.Label(root, text='Masse du grimpeur (kg)').pack()
 choixmasse = tk.Spinbox(root, from_=50, to=150, increment=0.5, width=5)
-choixmasse.pack()
+choixmasse.pack() #Cela place le label dans la fenêtre de manière simple, en l'empilant verticalement avec les autres éléments de l'interface graphique
 
 tk.Label(root, text='Longueur de la corde (m)').pack()
 longueurcorde = tk.Spinbox(root, from_=25, to=100, increment=0.5, width=5)
 longueurcorde.pack()
-
-btLancer = tk.Button(root, text="Lancer la simulation", command=lambda: start_animation(ax, canvas, ax_anim))
-btLancer.pack()
-
+#Bouton démarage de la simulation
+btLancer = tk.Button(root, text="Lancer la simulation", command=lambda: start_animation(ax, canvas, ax_anim))#command-->appelle une fonction à exécuter
+btLancer.pack() #Ce bouton déclenche l'exécution de la fonction start_animation lorsque l'utilisateur clique dessus.
+#Création des graphiques et du canevas
 fig, ax = plt.subplots()
 canvas = FigureCanvasTkAgg(fig, master=root)
 canvas.get_tk_widget().pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
@@ -79,8 +85,8 @@ canvas.get_tk_widget().pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
 fig_anim, ax_anim = plt.subplots()
 canvas_anim = FigureCanvasTkAgg(fig_anim, master=root)
 canvas_anim.get_tk_widget().pack(side=tk.RIGHT, fill=tk.BOTH, expand=1)
-
+#Bouton quitter l'application
 btQuit = tk.Button(root, text='Quitter', command=root.destroy)
 btQuit.pack(side=tk.LEFT, padx=10, pady=10)
 
-root.mainloop()
+root.mainloop() #Cette ligne démarre la boucle principale de tkinter. Elle est nécessaire pour que l'interface graphique fonctionne et reste responsive. Tant que l'utilisateur n'a pas fermé la fenêtre, la boucle tourne et attend les interactions de l'utilisateur
