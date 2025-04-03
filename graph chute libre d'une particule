@@ -79,6 +79,106 @@ btQuit.pack(side=tk.LEFT, padx = 10, pady = 10)
 
 root.mainloop()
 
+
+
+
+
+
+
+
+# méthode avec une interface tkinker où il s'arrète à la longueur de la corde
+import numpy as np
+import tkinter as tk
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib.animation as animation
+
+# Création de l'interface Tkinter
+root = tk.Tk()
+root.title("Simulation de chute en escalade")
+
+# Création d'une zone de texte pour déterminer la masse
+zoneTexte = tk.Label(root, text = 'Quelle est la masse du grimpeur')
+zoneTexte.pack()
+choixmasse = tk.Spinbox(root,from_ =50,to = 150, increment = 0.5, width = 5)
+choixmasse.pack()
+
+# Création d'une zone de texte pour déterminer la longueur de la corde
+zoneTexte1 = tk.Label(root, text = 'Quelle est la longueur de la corde')
+zoneTexte1.pack()
+longueurcorde = tk.Spinbox(root,from_ =25,to = 100, increment = 0.5, width = 5)
+longueurcorde.pack()
+
+# Création d'une zone de texte pour déterminer la hauteur de la chute
+zoneTexte2 = tk.Label(root, text = 'Quelle est la hauteur de la chute ?')
+zoneTexte2.pack()
+hauteurchute = tk.Spinbox(root,from_ =1,to = 20, increment = 0.5, width = 5)
+hauteurchute.pack()
+
+# Création de la figure Matplotlib
+fig, ax = plt.subplots()
+canvas = FigureCanvasTkAgg(fig, master=root)
+canvas.get_tk_widget().pack()
+
+
+# Fonction pour démarrer l'animation
+def start_animation():
+ 
+
+    longueur_corde = float(longueurcorde.get())
+    poids_grimpeur = float(choixmasse.get())
+    hauteur_chute = float(hauteurchute.get())
+    gravite = 9.81  # Accélération due à la gravité (m/s^2)
+    temps_total = 3  # Durée totale de l'animation (s)
+    n_frames = 100  # Nombre de frames dans l'animation
+ 
+
+    dt = temps_total / n_frames  # Intervalle de temps entre chaque frame
+    coef_elasticite = max(0.1, 1 - (poids_grimpeur / 100))  # Plus le grimpeur est lourd, moins la corde rebondit
+
+    # Positions du grimpeur au fil du temps
+    temps = np.linspace(0, temps_total, n_frames)
+    y_positions = []
+    vitesse = 0
+    y = hauteur_chute
+ 
+    for t in temps:
+        if y < hauteurchute-longueur_corde:
+            vitesse -= gravite * dt
+            y += vitesse * dt
+        else:
+            vitesse = -vitesse * coef_elasticite  # Simulation de l'effet de rebond de la corde
+            y += vitesse * dt
+            if abs(vitesse) < 0.1:  # Si le mouvement devient trop faible, on arrête
+                vitesse = 0
+        y_positions.append(y)
+ 
+    # Mise à jour du graphique
+    ax.clear()
+    ax.plot(temps, y_positions, label="Chute du grimpeur")
+    ax.set_xlabel("Temps (s)")
+    ax.set_ylabel("Position (m)")
+    ax.legend()
+    canvas.draw()
+
+#Création d'un bouton Démarrer
+btLancer=tk.Button(root, text="Lancer la simulation", command=start_animation())
+btLancer.pack()
+
+
+#Création d'un bouton quitter
+btQuit = tk.Button(root, text ='Quitter', command = root.destroy)
+btQuit.pack(side=tk.LEFT, padx = 10, pady = 10)
+
+root.mainloop()
+
+
+
+
+
+
+
+
 #autre méthode
 import matplotlib.pyplot as plt
 import numpy as np
