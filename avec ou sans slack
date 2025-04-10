@@ -1,7 +1,7 @@
 #Premier programme assureur passif + pas de slack 
 import matplotlib.pyplot as plt
 
-# Paramètres
+# Paramètres ici rentré a la main mais faudrat les mettre en lien avec l'interface
 m = 70  # kg
 g = 9.81  # m/s²
 L0 = 10  # longueur de corde avant la chute (m)
@@ -21,12 +21,12 @@ temps = []
 
 while t < Tmax:
     if y > L0:
-        F_spring = -k * (y - L0)
+        F_spring = -k * (y - L0) # Force de rapelle vers le haut car y > L
     else:
-        F_spring = 0
+        F_spring = 0  # la corde est détendue
 
-    Fg = m * g
-    F_total = Fg + F_spring
+    P = m * g #poids
+    F_total = P + F_spring
     a = F_total / m
 
     v += a * dt
@@ -123,3 +123,193 @@ plt.xlabel("Temps (s)")
 
 plt.tight_layout()
 plt.show()
+
+
+
+
+
+
+# ce programme est faut mais tout n'est pas a jeter , ce qui est pertinant c'est la modelisation du saut de l'assureur mais il est mal lié au grimpeur 
+# troisième programme: modelisation de la chute d'un grimpeur avec un assureur qui saute , l'assureur est modelisé par une masse qui fait un saut en forme sinusoidale + pas de mou 
+# dans ce programe l'assureur n'es pas lié au grimpeur par ca masse , pour plus de realisme on devreit modelisé l'assureur comme une masse relié a une autre masse ( le grimpeur ) par une corde car 
+#quand la corde se tend, il peut être soulevé, reculer ou résister (en fonction de son poids, position et type d’assurage).
+import matplotlib.pyplot as plt
+import numpy as np
+
+# === Paramètres physiques ===
+m = 70              # Masse du grimpeur en kg
+g = 9.81            # Gravité (m/s²)
+L0 = 10             # Longueur de corde (sans mou)
+slack = 0           # Mou ajouté volontairement (ici 0)
+k = 1500            # Raideur de la corde (N/m)
+dt = 0.01           # Pas de temps
+Tmax = 5            # Durée totale
+
+# === Paramètres du "saut" de l'assureur ===
+h_saut = 0.5        # Hauteur du saut (m)
+d_saut = 0.5        # Durée totale du saut (s)
+
+# Fonction qui donne le déplacement vertical du point d'ancrage en fonction du temps 
+#Elle représente comment le point d'ancrage de la corde monte puis redescend quand l’assureur saute.
+def mouvement_assureur(t):
+    if t < d_saut:
+        # Mouvement sinusoïdal vertical doux : max au milieu du saut
+        return h_saut * np.sin(np.pi * t / d_saut)
+    else:
+        return 0
+
+# === Conditions initiales ===
+y = 0       # Position du grimpeur (vers le bas, 0 = point d'ancrage initial)
+v = 0       # Vitesse initiale
+t = 0       # Temps
+
+# === Stockage des résultats ===
+positions = []
+vitesses = []
+temps = []
+
+# === Boucle de simulation ===
+while t < Tmax:
+    # Position du point d'ancrage du grimpeur à cet instant
+    ancrage_mobile = L0 + slack + mouvement_assureur(t)
+
+    # Si la corde est tendue
+    if y > ancrage_mobile:
+        F_spring = -k * (y - ancrage_mobile)  # Rappel vers le haut
+    else:
+        F_spring = 0
+
+    # Force gravitationnelle
+    F_grav = m * g
+
+    # Résultat des forces
+    F_total = F_grav + F_spring
+    a = F_total / m
+
+    # Intégration numérique (Euler)
+    v += a * dt
+    y += v * dt
+    t += dt
+
+    # Stockage
+    positions.append(y)
+    vitesses.append(v)
+    temps.append(t)
+
+# === Affichage ===
+plt.figure(figsize=(10, 6))
+
+plt.subplot(2, 1, 1)
+plt.plot(temps, positions, label="Position du grimpeur")
+plt.plot(temps, [L0 + slack + mouvement_assureur(ti) for ti in temps], '--', label="Point d'ancrage")
+plt.ylabel("Position (m)")
+plt.title("Chute avec assureur qui saute")
+plt.legend()
+
+plt.subplot(2, 1, 2)
+plt.plot(temps, vitesses)
+plt.ylabel("Vitesse (m/s)")
+plt.xlabel("Temps (s)")
+
+plt.tight_layout()
+plt.show
+
+
+
+# ce qu'on avait mal pris en compte c'eqt que si l’assureur monte pendant cette phase, il ajoute du mou virtuel, donc le grimpeur chute plus longtemps avant que la corde se tende.
+#Concrètement :Quand l’assureur monte de h_saut, c’est comme si on ajoutait h_saut de slack supplémentaire pendant le saut.
+# Pour l'instant j'ai pas resolut le problème !
+
+
+
+
+# enfin on crée un programme qui combine les diferrents cas dans le but de pouvoirs les avoir sur un même graph pour pouvoir les comparée 
+# il faut changé le paramètre slack et le mouvement de l’assureur selon le cas
+# ici puisse que le probleme du troisieme programme n'a pas encore été resolut pour distingué les courbes sans mou + assureur inactif et la courbe sans mou + assureur actif j'ai ajouté artificiélement 
+# 1m de slack qui represente le mou gagné quand l'assureur saute, on distingue alors 3 courbes  
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+# === Constantes physiques ===
+m = 70              # Masse du grimpeur (kg)
+g = 9.81            # Gravité (m/s²)
+L0 = 10             # Longueur de corde (m)
+k = 1500            # Raideur de la corde (N/m)
+dt = 0.01           # Pas de temps (s)
+Tmax = 5            # Durée de la simulation (s)
+# === Temps commun à tous les cas ===
+temps = np.arange(0, Tmax, dt)
+
+# === Paramètres du saut de l'assureur ===
+h_saut = 0.5        # Hauteur max du saut (m)
+d_saut = 0.5        # Durée totale du saut (s)
+
+# Fonction : mouvement vertical de l’assureur
+def mouvement_assureur(t, saut=False):
+    if saut and t < d_saut:
+        return h_saut * np.sin(np.pi * t / d_saut)
+    else:
+        return 0
+
+# Fonction générique de simulation
+def simuler_chute(slack=0, saut=False, temps=None):
+    y = 0
+    v = 0
+
+    positions = []
+    vitesses = []
+
+    for t in temps:
+        ancrage_mobile = L0 + slack + mouvement_assureur(t, saut)
+
+        if y > ancrage_mobile:
+            F_spring = -k * (y - ancrage_mobile)
+        else:
+            F_spring = 0
+
+        a = (m * g + F_spring) / m
+        v += a * dt
+        y += v * dt
+
+        positions.append(y)
+        vitesses.append(v)
+
+    return positions, vitesses
+
+# === Lancement des trois simulations ===
+# 1. Assureur fixe, pas de mou
+y1, v1 = simuler_chute(slack=0, saut=False, temps=temps)
+
+# 2. Assureur fixe, avec mou
+y2, v2 = simuler_chute(slack=2, saut=False, temps=temps)  # 2m de mou en plus
+
+# 3. Assureur qui saute
+y3, v3 = simuler_chute(slack=1, saut=True,  temps=temps)   # c'est ici que l'ajout de slack c'est fait normalement puisse qu'on modelise un assureur qui saute sans donné de mou avant on aurait du marqué slack= 0
+
+# === Tracés ===
+plt.figure(figsize=(12, 6))
+
+# Position
+plt.subplot(2, 1, 1)
+plt.plot(temps, y1, label="Fixe, sans mou")
+plt.plot(temps, y2, label="Fixe, avec mou")
+plt.plot(temps, y3, label="Assureur qui saute")
+plt.ylabel("Position du grimpeur (m)")
+plt.title("Comparaison des positions (grimpeur)")
+plt.legend()
+
+# Vitesse
+plt.subplot(2, 1, 2)
+plt.plot(temps, y1, label="Fixe, sans mou")
+plt.plot(temps, y2, label="Fixe, avec mou")
+plt.plot(temps, y3, label="Assureur qui saute")
+plt.ylabel("Vitesse (m/s)")
+plt.xlabel("Temps (s)")
+plt.title("Comparaison des vitesses (grimpeur)")
+plt.legend()
+
+plt.tight_layout()
+plt.show()
+
+# il faut maintenant vérifié que les courbes obtenues soit coherente avec la theorie. es ce qu'on a bien une chute "soft" pour le mou et l'assureur actif et une chute plus "hard" pour l'assureur passif ?
