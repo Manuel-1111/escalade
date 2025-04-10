@@ -1,0 +1,125 @@
+#Premier programme assureur passif + pas de slack 
+import matplotlib.pyplot as plt
+
+# Paramètres
+m = 70  # kg
+g = 9.81  # m/s²
+L0 = 10  # longueur de corde avant la chute (m)
+k = 1500  # raideur approximative de la corde dynamique (N/m)
+dt = 0.01  # pas de temps (s)
+Tmax = 5  # temps max (s) de la simulation 
+
+# Conditions initiales
+y = 0  # position par rapport au point de chute
+v = 0  # vitesse
+t = 0
+
+# Listes pour stocker les résultats
+positions = []
+vitesses = []
+temps = []
+
+while t < Tmax:
+    if y > L0:
+        F_spring = -k * (y - L0)
+    else:
+        F_spring = 0
+
+    Fg = m * g
+    F_total = Fg + F_spring
+    a = F_total / m
+
+    v += a * dt
+    y += v * dt
+    t += dt
+
+    positions.append(y)
+    vitesses.append(v)
+    temps.append(t)
+
+# Affichage
+plt.figure(figsize=(10,5))
+plt.subplot(2,1,1)
+plt.plot(temps, positions)
+plt.title("Chute d'un grimpeur avec assureur passif")
+plt.ylabel("Position (m)")
+
+plt.subplot(2,1,2)
+plt.plot(temps, vitesses)
+plt.ylabel("Vitesse (m/s)")
+plt.xlabel("Temps (s)")
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+# deuxieme programe : assureur passif + slack
+import matplotlib.pyplot as plt
+
+# === Paramètres physiques ===
+m = 70             # masse du grimpeur en kg
+g = 9.81           # gravité en m/s²
+L0 = 10            # longueur de corde normale en m
+slack = 2          # mou supplémentaire en m (à tester avec 0 puis >0)
+k = 1500           # raideur (spring constant) de la corde en N/m
+dt = 0.01          # pas de temps en secondes
+Tmax = 5           # durée max de la simulation
+
+# === Calcul de la longueur totale de corde ===
+L_total = L0 + slack  # longueur effective de la corde avec mou
+
+# === Conditions initiales ===
+y = 0       # position verticale (chute vers le bas → y > 0)
+v = 0       # vitesse initiale
+t = 0       # temps initial
+
+# === Stockage des résultats ===
+positions = []
+vitesses = []
+temps = []
+
+# === Boucle de simulation ===
+while t < Tmax:
+    # Si la corde commence à s'étirer (le grimpeur a chuté plus bas que la longueur de corde)
+    if y > L_total:
+        F_spring = -k * (y - L_total)  # force de rappel vers le haut
+    else:
+        F_spring = 0  # la corde est détendue
+
+    F_grav = m * g  # force gravitationnelle vers le bas
+    F_total = F_grav + F_spring  # somme des forces (positive = vers le bas)
+    a = F_total / m  # accélération résultante
+
+    # Mise à jour des états avec intégration d’Euler
+    v += a * dt
+    y += v * dt
+    t += dt
+
+    # Sauvegarde des résultats
+    positions.append(y)
+    vitesses.append(v)
+    temps.append(t)
+
+# === Affichage ===
+plt.figure(figsize=(10, 6))
+
+plt.subplot(2, 1, 1)
+plt.plot(temps, positions)
+plt.ylabel("Position (m)")
+plt.title(f"Chute avec slack = {slack} m")
+
+plt.subplot(2, 1, 2)
+plt.plot(temps, vitesses)
+plt.ylabel("Vitesse (m/s)")
+plt.xlabel("Temps (s)")
+
+plt.tight_layout()
+plt.show()
