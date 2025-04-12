@@ -1,3 +1,4 @@
+# Dans ce document plus on dessend plus la modelisation s'approche de la réalité 
 #Premier programme assureur passif + pas de slack 
 import matplotlib.pyplot as plt
 
@@ -317,7 +318,7 @@ plt.tight_layout()
 
 
 
-
+# Amortissement:
 # il faut considéré les frottemments et pour que le grimpeur n'oscille pas il faut se placer en regime critique 
 # on reprend avec l'assureur passif 
 import matplotlib.pyplot as plt
@@ -382,5 +383,76 @@ plt.xlabel("Temps (s)")
 plt.tight_layout()
 plt.show()
 plt.show()
+
+
+
+# avec du slack et un amortissement critique 
+import matplotlib.pyplot as plt
+import numpy as np
+
+# === Paramètres ===
+m = 70               # Masse du grimpeur (kg)
+g = 9.81             # Gravité (m/s²)
+L0 = 10              # Longueur de corde initiale (m)
+slack = 2            # Mou supplémentaire (m)
+k = 1500             # Raideur de la corde (N/m)
+
+# Calcul de l’amortissement critique
+b = 2 * np.sqrt(m * k)  # Amortissement critique (kg/s)
+
+dt = 0.01             # Pas de temps (s)
+Tmax = 5              # Temps total de simulation (s)
+
+# === Conditions initiales ===
+y = 0                 # Position (m)
+v = 0                 # Vitesse (m/s)
+t = 0                 # Temps (s)
+
+# === Résultats à stocker ===
+positions = []
+vitesses = []
+temps = []
+
+# === Simulation ===
+while t < Tmax:
+    # Longueur totale de corde avant tension (avec le slack)
+    L_effective = L0 + slack
+
+    # La corde agit seulement si y dépasse L_effective
+    if y > L_effective:
+        F_spring = -k * (y - L_effective)  # Force élastique
+        F_damping = -b * v                 # Force d’amortissement
+    else:
+        F_spring = 0
+        F_damping = 0
+
+    P = m * g
+    F_total = P + F_spring + F_damping
+    a = F_total / m
+
+    v += a * dt
+    y += v * dt
+    t += dt
+
+    positions.append(y)
+    vitesses.append(v)
+    temps.append(t)
+
+# === Affichage ===
+plt.figure(figsize=(10, 5))
+
+plt.subplot(2, 1, 1)
+plt.plot(temps, positions)
+plt.title("Chute d’un grimpeur avec slack et amortissement critique")
+plt.ylabel("Position (m)")
+
+plt.subplot(2, 1, 2)
+plt.plot(temps, vitesses, color="orange")
+plt.ylabel("Vitesse (m/s)")
+plt.xlabel("Temps (s)")
+
+plt.tight_layout()
+plt.show()
+
 
 # il faut maintenant vérifié que les courbes obtenues soit coherente avec la theorie. es ce qu'on a bien une chute "soft" pour le mou et l'assureur actif et une chute plus "hard" pour l'assureur passif ?
