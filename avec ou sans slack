@@ -455,4 +455,95 @@ plt.tight_layout()
 plt.show()
 
 
+
+
+
+
+# Nouvelle methode pour la chute du grimpeur avec l'assureur qui saute Nouveau Flop
+# Attention l'origine des point n'est pas pris au même endroit que precedement
+#Le point d’ancrage est fixe (renvoi en haut), le grimpeur tombe à partir de la hauteur du point d'ancrage (0 m),
+#l'assureur est au sol au départ (hauteur = 0 m),quand la corde se tend, la force est transmise des deux côtés : grimpeur ralenti + assureur tiré,
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+# === Paramètres physiques ===
+m1 = 70      # Masse du grimpeur (kg)
+m2 = 65      # Masse de l’assureur (kg)
+g = 9.81     # Gravité (m/s²)
+k = 1500     # Raideur de la corde (N/m)
+b = 2 * np.sqrt(m1 * k)  # Amortissement critique pour grimpeur
+L0 = 10      # Longueur de la corde détendue (m)
+
+# === Temps ===
+dt = 0.01
+Tmax = 5
+
+# === Conditions initiales ===
+y1 = 0       # Position du grimpeur (0 = point d’ancrage)
+v1 = 0       # Vitesse du grimpeur
+y2 = -L0     # Position de l’assureur (au sol, corde détendue)
+v2 = 0       # Vitesse de l’assureur
+t = 0
+
+# === Stockage des données ===
+temps = []
+positions_grimpeur = []
+positions_assureur = []
+vitesses_grimpeur = []
+vitesses_assureur = []
+
+# === Boucle de simulation ===
+while t < Tmax:
+    # Distance entre grimpeur et assureur
+    L = y1 - y2
+    if L > L0:
+        # Corde tendue : force de rappel + amortissement
+        F_spring = -k * (L - L0)
+        F_damping = -b * (v1 - v2)
+    else:
+        F_spring = 0
+        F_damping = 0
+
+    # Forces totales
+    F1 = m1 * g + F_spring + F_damping
+    F2 = m2 * g - F_spring - F_damping
+
+    # Accélérations
+    a1 = F1 / m1
+    a2 = F2 / m2
+
+    # Mise à jour des vitesses et positions
+    v1 += a1 * dt
+    y1 += v1 * dt
+    v2 += a2 * dt
+    y2 += v2 * dt
+    t += dt
+
+    # Enregistrement
+    temps.append(t)
+    positions_grimpeur.append(y1)
+    positions_assureur.append(y2)
+    vitesses_grimpeur.append(v1)
+    vitesses_assureur.append(v2)
+
+# === Affichage des résultats ===
+plt.figure(figsize=(10, 6))
+
+plt.subplot(2, 1, 1)
+plt.plot(temps, positions_grimpeur, label="Grimpeur")
+plt.plot(temps, positions_assureur, label="Assureur")
+plt.ylabel("Position (m)")
+plt.title("Modèle grimpeur + assureur (deux masses reliées)")
+plt.legend()
+
+plt.subplot(2, 1, 2)
+plt.plot(temps, vitesses_grimpeur, label="Grimpeur")
+plt.plot(temps, vitesses_assureur, label="Assureur")
+plt.ylabel("Vitesse (m/s)")
+plt.xlabel("Temps (s)")
+plt.legend()
+
+plt.tight_layout()
+plt.show()
 # il faut maintenant vérifié que les courbes obtenues soit coherente avec la theorie. es ce qu'on a bien une chute "soft" pour le mou et l'assureur actif et une chute plus "hard" pour l'assureur passif ?
