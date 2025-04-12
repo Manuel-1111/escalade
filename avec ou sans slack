@@ -310,6 +310,77 @@ plt.title("Comparaison des vitesses (grimpeur)")
 plt.legend()
 
 plt.tight_layout()
+
+
+
+
+
+
+
+
+# il faut considéré les frottemments et pour que le grimpeur n'oscille pas il faut se placer en regime critique 
+# on reprend avec l'assureur passif 
+import matplotlib.pyplot as plt
+import numpy as np
+
+# === Paramètres physiques ===
+m = 70          # Masse du grimpeur (kg)
+g = 9.81        # Gravité (m/s²)
+L0 = 10         # Longueur de la corde avant chute (m)
+k = 1500        # Raideur de la corde (N/m)
+
+# Calcul de l'amortissement critique
+b = 2 * np.sqrt(m * k)  # Amortissement critique (kg/s)
+
+dt = 0.01       # Pas de temps (s)
+Tmax = 5        # Durée totale de la simulation (s)
+
+# === Conditions initiales ===
+y = 0           # Position du grimpeur (m)
+v = 0           # Vitesse (m/s)
+t = 0           # Temps (s)
+
+# === Listes pour les résultats ===
+positions = []
+vitesses = []
+temps = []
+
+# === Simulation ===
+while t < Tmax:
+    if y > L0:
+        F_spring = -k * (y - L0)     # Force élastique (ressort)
+        F_damping = -b * v           # Force d’amortissement critique
+    else:
+        F_spring = 0
+        F_damping = 0
+
+    P = m * g                        # Poids
+    F_total = P + F_spring + F_damping
+    a = F_total / m                 # Accélération
+
+    v += a * dt
+    y += v * dt
+    t += dt
+
+    positions.append(y)
+    vitesses.append(v)
+    temps.append(t)
+
+# === Affichage ===
+plt.figure(figsize=(10, 5))
+
+plt.subplot(2, 1, 1)
+plt.plot(temps, positions)
+plt.title("Chute d’un grimpeur assureur passif  – amortissement critique (pas d'oscillation)")
+plt.ylabel("Position (m)")
+
+plt.subplot(2, 1, 2)
+plt.plot(temps, vitesses, color='orange')
+plt.ylabel("Vitesse (m/s)")
+plt.xlabel("Temps (s)")
+
+plt.tight_layout()
+plt.show()
 plt.show()
 
 # il faut maintenant vérifié que les courbes obtenues soit coherente avec la theorie. es ce qu'on a bien une chute "soft" pour le mou et l'assureur actif et une chute plus "hard" pour l'assureur passif ?
