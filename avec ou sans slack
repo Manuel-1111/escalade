@@ -757,6 +757,178 @@ plt.show()
 
 
 
+
+
+
+
+
+# code plus claire :
+import matplotlib.pyplot as plt
+import numpy as np
+
+# ------------------------------
+# PARAMÈTRES GÉNÉRAUX DE LA SIMULATION
+# ------------------------------
+
+m = 70  # Masse du grimpeur (kg)
+g = 9.81  # Accélération gravitationnelle (m/s²)
+L0 = 10  # Longueur de corde initiale (m)
+k = 1500  # Raideur de la corde (N/m) — modélise l’élasticité de la corde dynamique
+dt = 0.001  # Pas de temps très petit pour une simulation plus précise
+Tmax = 5  # Durée totale de la simulation (secondes)
+
+# Calcul de l'amortissement critique pour que la corde ne fasse pas osciller le grimpeur
+# C'est une formule standard de physique pour éviter les oscillations
+b_critique = 2 * np.sqrt(m * k)
+
+# ------------------------------
+# FONCTION DE SIMULATION D'UNE CHUTE
+# ------------------------------
+def simuler_chute(mou=0, assureur_saute=False, temps_saut=0.5, h_saut=0.5):
+    """
+    Cette fonction simule la chute d’un grimpeur.
+    Elle prend en compte :
+    - un éventuel mou dans la corde
+    - un assureur qui saute pour amortir la chute
+
+    Elle retourne trois listes : temps, positions, vitesses
+    """
+
+    # Initialisation des conditions de départ
+    y = 0  # Position verticale du grimpeur par rapport au point de départ
+    v = 0  # Vitesse initiale
+    t = 0  # Temps initial
+
+    # Listes pour stocker les résultats
+    positions = []
+    vitesses = []
+    temps = []
+
+    # Boucle principale : on avance dans le temps petit à petit
+    while t < Tmax:
+        # Mou = ajout de longueur supplémentaire de corde (plus de vitesse accumulée)
+        L_eff = L0 + mou
+
+        # Si l’assureur saute, on ajoute un déplacement vertical de son corps
+        # Cela augmente la distance que le grimpeur peut parcourir avant que la corde se tende
+        if assureur_saute and t < temps_saut:
+            # Déplacement progressif de l’assureur selon un profil parabolique (doux au début et à la fin)
+            y_assureur = h_saut * (t / temps_saut)**2
+        else:
+            y_assureur = h_saut if assureur_saute else 0
+
+        # Distance de corde tendue (si le grimpeur est plus bas que la corde étirée)
+        if y > L_eff + y_assureur:
+            F_spring = -k * (y - L_eff - y_assureur)  # Force élastique de la corde
+            F_amortissement = -b_critique * v  # Force d’amortissement proportionnelle à la vitesse
+        else:
+            F_spring = 0
+            F_amortissement = 0
+
+        # Poids du grimpeur (force constante vers le bas)
+        P = m * g
+
+        # Somme de toutes les forces (poids + rappel élastique + amortissement)
+        F_total = P + F_spring + F_amortissement
+
+        # Deuxième loi de Newton : F = m * a → donc a = F / m
+        a = F_total / m
+
+        # Mise à jour de la vitesse et de la position
+        v += a * dt
+        y += v * dt
+        t += dt
+
+        # On enregistre les résultats à ce pas de temps
+        positions.append(y)
+        vitesses.append(v)
+        temps.append(t)
+
+    return temps, positions, vitesses
+
+# ------------------------------
+# SIMULATIONS DES TROIS CAS
+# ------------------------------
+
+# Cas 1 : Assureur fixe, pas de mou
+t1, pos1, vit1 = simuler_chute(mou=0, assureur_saute=False)
+
+# Cas 2 : Assureur fixe, avec un peu de mou (1 m)
+t2, pos2, vit2 = simuler_chute(mou=1, assureur_saute=False)
+
+# Cas 3 : Assureur qui saute (0.5 m de saut sur 0.5 s)
+t3, pos3, vit3 = simuler_chute(mou=0, assureur_saute=True, temps_saut=0.5, h_saut=0.5)
+
+# ------------------------------
+# AFFICHAGE DES RÉSULTATS
+# ------------------------------
+
+plt.figure(figsize=(12, 8))
+
+# Graphe 1 : Position en fonction du temps
+plt.subplot(2, 1, 1)
+plt.plot(t1, pos1, label="Assureur fixe, sans mou", color='blue')
+plt.plot(t2, pos2, label="Assureur fixe, avec mou", color='orange')
+plt.plot(t3, pos3, label="Assureur qui saute", color='green')
+plt.ylabel("Position du grimpeur (m)")
+plt.title("Comparaison des modèles de chute")
+plt.legend()
+plt.grid(True)
+
+# Graphe 2 : Vitesse en fonction du temps
+plt.subplot(2, 1, 2)
+plt.plot(t1, vit1, label="Assureur fixe, sans mou", color='blue')
+plt.plot(t2, vit2, label="Assureur fixe, avec mou", color='orange')
+plt.plot(t3, vit3, label="Assureur qui saute", color='green')
+plt.xlabel("Temps (s)")
+plt.ylabel("Vitesse du grimpeur (m/s)")
+plt.legend()
+plt.grid(True)
+
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # maintenant une version avec en plus la force subie par le grimpeur
 #il reste des modifications à faire notamment sur le saut de l'assureur qui n'as pas l'effet escompté ainsi que l'amortissement
 
