@@ -83,18 +83,18 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
     # Mise à jour du graphique (position du grimpeur au fil du temps)
     ax_pos.clear()
     ax_pos.plot(temps_a, positions_a, label="Sans mou", color='blue')
-    ax_pos.plot(temps_b, positions_b, label="Avec slack", color='green')
+    ax_pos.plot(temps_b, positions_b, label="Avec mou", color='green')
     ax_pos.plot(temps_c, positions_c, label="Assureur saute", color='red')
     ax_pos.set_xlabel("Temps (s)")
     ax_pos.set_ylabel("Position (m)")
     ax_pos.legend()
-    ax_pos.set_ylim(0, longueur_corde + slack)  # Assure que l'axe y montre toute la chute et le slack
+    ax_pos.set_ylim(-10, longueur_corde + slack)  # Assure que l'axe y montre toute la chute et le slack
     canvas_pos.draw()  # Redessine le graphique sur le canevas
 
     # Mise à jour du graphique de la vitesse du grimpeur
     ax_vitesse.clear()
-    ax_vitesse.plot(temps_a, vitesses_a, label="Sans slack", color='blue')
-    ax_vitesse.plot(temps_b, vitesses_b, label="Avec slack", color='green')
+    ax_vitesse.plot(temps_a, vitesses_a, label="Sans mou", color='blue')
+    ax_vitesse.plot(temps_b, vitesses_b, label="Avec mou", color='green')
     ax_vitesse.plot(temps_c, vitesses_c, label="Assureur saute", color='red')
     ax_vitesse.set_xlabel("Temps (s)")
     ax_vitesse.set_ylabel("Vitesse (m/s)")
@@ -105,21 +105,21 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
 
     # Mise à jour du graphique de la force subie par le grimpeur
     ax_force.clear()
-    ax_force.plot(temps_a, force_a, label="Sans slack", color='blue')
-    ax_force.plot(temps_b, force_b, label="Avec slack", color='green')
+    ax_force.plot(temps_a, force_a, label="Sans mou", color='blue')
+    ax_force.plot(temps_b, force_b, label="Avec mou", color='green')
     ax_force.plot(temps_c, force_c, label="Assureur saute", color='red')
     ax_force.set_xlabel("Temps (s)")
     ax_force.set_ylabel("Force subie (N)")
     ax_force.legend()
-    ax_force.set_ylim(0, max(max(forces_a), max(forces_b), max(forces_c)) + 100)
+    ax_force.set_ylim(0, max(max(force_a), max(force_b), max(force_c)) + 100)
     canvas_force.draw()  # Redessine le graphique sur le canevas
 
     # Configuration de l'animation pour les trois situations
     ax_anim.clear()
     ax_anim.set_xlim(0, 10)  # Limites des axes pour l'animation
     ax_anim.set_ylim(0, longueur_corde + slack)  # Assure que l'axe y montre toute la chute et le slack
-    grimpeur_sans_mou, = ax_anim.plot([], [], 'bo', markersize=10, label="Sans slack")  # Création du grimpeur sans slack
-    grimpeur_avec_mou, = ax_anim.plot([], [], 'go', markersize=10, label="Avec slack")  # Création du grimpeur avec slack
+    grimpeur_sans_mou, = ax_anim.plot([], [], 'bo', markersize=10, label="Sans mou")  # Création du grimpeur sans slack
+    grimpeur_avec_mou, = ax_anim.plot([], [], 'go', markersize=10, label="Avec mou")  # Création du grimpeur avec slack
     grimpeur_assureur_saut, = ax_anim.plot([], [], 'ro', markersize=10, label="Assureur saute")  # Création du grimpeur avec assureur qui saute
     assureur_saut, = ax_anim.plot([], [], 'ks', markersize=12, label="Assureur")  # Assureur position fixe
 
@@ -133,14 +133,14 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
     # Mise à jour de l'animation pour les 3 situations
     def update(frame):
         # Mise à jour des positions pour chaque cas
-        grimpeur_sans_mou.set_data([5], [max(positions_a[frame], 0)])
-        grimpeur_avec_mou.set_data([5.2], [max(positions_b[frame], 0)])
-        grimpeur_assureur_saut.set_data([4.8], [max(positions_c[frame], 0)])  # Position du assureur qui saute
+        grimpeur_sans_mou.set_data([5], [positions_a[frame]])
+        grimpeur_avec_mou.set_data([5.2], [positions_b[frame]])
+        grimpeur_assureur_saut.set_data([4.8], [positions_c[frame]])  # Position du assureur qui saute
 
         # Mise à jour des cordes
-        corde_sans_mou.set_data([5, 5], [max(positions_a[frame], 0), longueur_corde])  # Corde sans slack
-        corde_avec_mou.set_data([5.2, 5.2], [max(positions_b[frame], 0), longueur_corde + slack])  # Corde avec slack
-        corde_assureur_saut.set_data([4.8, 4.8], [max(positions_c[frame], 0), longueur_corde + y_assureur_saut])  # Corde avec assureur qui saute
+        corde_sans_mou.set_data([5, 5], [positions_a[frame], longueur_corde])  # Corde sans slack
+        corde_avec_mou.set_data([5.2, 5.2], [positions_b[frame], longueur_corde + slack])  # Corde avec slack
+        corde_assureur_saut.set_data([4.8, 4.8], [positions_c[frame], longueur_corde + assureur_saut])  # Corde avec assureur qui saute
 
         return grimpeur_sans_mou, grimpeur_avec_mou, grimpeur_assureur_saut, assureur_saut, corde_sans_mou, corde_avec_mou, corde_assureur_saut
 
@@ -160,7 +160,7 @@ tk.Label(root, text='Longueur de la corde (m)').pack()
 longueurcorde = tk.Spinbox(root, from_=25, to=100, increment=0.5, width=5)
 longueurcorde.pack()
 
-tk.Label(root, text='Slack (m)').pack()
+tk.Label(root, text='Corde supplémentaire/mou (m)').pack()
 slack_entry = tk.Entry(root)
 slack_entry.insert(0, "0")
 slack_entry.pack()
