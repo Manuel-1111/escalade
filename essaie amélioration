@@ -1,0 +1,199 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import tkinter as tk
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib.animation as animation
+
+
+
+def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_force, canvas_force):
+    # Initialisation des paramètres
+    longueur_corde = float(longueurcorde.get())
+    poids_grimpeur = float(choixmasse.get())
+    gravite = 9.81
+    temps_total = 4  # Temps total de la simulation
+    n_frames = 100  # Nombre de frames de l'animation
+    dt = temps_total / n_frames
+    coef_elasticite = max(0.1, 1 - (poids_grimpeur / 100))  # Coefficient d'élasticité de la corde
+    slack = float(slack_entry.get())  # Slack de la corde
+    # --- Paramètres physiques ---
+    g = 9.81       # Gravité (m/s²)
+    L0 = 10        # Longueur de corde initiale (m)
+    k = 1500       # Raideur de la corde (N/m)
+    b = 2 * np.sqrt(m * k)  # Amortissement critique
+    dt = 0.001     # Pas de temps (s)
+    Tmax = 5       # Durée de la simulation (s)
+    saut_assureur = 1  # Hauteur du saut de l'assureur (cas 3)
+    def simulate_chute(L0_effectif, mouvement_point_fixe=None):
+        y = 0
+        v = 0
+        t = 0
+        pos = []
+        vit = []
+        temps = []
+        force = []
+
+        while t < Tmax:
+        # Position du point d’ancrage (optionnel)
+            if mouvement_point_fixe:
+                y_ancrage = mouvement_point_fixe(t)
+            else:
+                y_ancrage = 0
+
+        # Allongement de la corde (si tendue)
+            extension = y - y_ancrage - L0_effectif
+            if extension > 0:
+                F_spring = -k * extension
+                F_damping = -b * v
+            else:
+                F_spring = 0
+                F_damping = 0
+
+            F_tot = m * g + F_spring + F_damping
+            F_subie = m * g - F_spring - F_damping
+            a = F_tot / m
+            v += a * dt
+            y += v * dt
+            t += dt
+
+            pos.append(y - y_ancrage)  # position relative à l’ancrage
+            vit.append(v)
+            temps.append(t)
+            force.append(F_subie)
+
+    return temps, pos, vit, force
+
+# --- Cas 1 : assureur fixe, pas de mou ---
+    temps_a, positions_a, vitesses_a, force_a = simulate_chute(L0)
+
+# --- Cas 2 : assureur fixe, avec mou ---
+    temps_b, positions_b, vitesses_b, force_b = simulate_chute(L0 + slack)
+
+# --- Cas 3 : assureur qui saute ---
+    def mouvement_assureur(t):
+    # Mouvement linéaire vers le haut (saut) sur 0.5s
+        if t < 0.5:
+            return -saut_assureur * t / 0.5
+        else:
+            return -saut_assureur
+
+    temps_c, positions_c, vitesses_c, force_c = simulate_chute(L0, mouvement_assureur, poids_grimpeur, longueur_corde)
+
+    # Mise à jour du graphique (position du grimpeur au fil du temps)
+    ax_pos.clear()
+    ax_pos.plot(temps, positions_a, label="Sans mou", color='blue')
+    ax_pos.plot(temps, positions_b, label="Avec slack", color='green')
+    ax_pos.plot(temps, positions_c, label="Assureur saute", color='red')
+    ax_pos.set_xlabel("Temps (s)")
+    ax_pos.set_ylabel("Position (m)")
+    ax_pos.legend()
+    ax_pos.set_ylim(0, longueur_corde + slack)  # Assure que l'axe y montre toute la chute et le slack
+    canvas_pos.draw()  # Redessine le graphique sur le canevas
+
+    # Mise à jour du graphique de la vitesse du grimpeur
+    ax_vitesse.clear()
+    ax_vitesse.plot(temps, vitesses_a, label="Sans slack", color='blue')
+    ax_vitesse.plot(temps, vitesses_b, label="Avec slack", color='green')
+    ax_vitesse.plot(temps, vitesses_c, label="Assureur saute", color='red')
+    ax_vitesse.set_xlabel("Temps (s)")
+    ax_vitesse.set_ylabel("Vitesse (m/s)")
+    ax_vitesse.legend()
+    ax_vitesse.set_ylim(min(min(vitesses_a), min(vitesses_b), min(vitesses_c)) - 1,
+                        max(max(vitesses_a), max(vitesses_b), max(vitesses_c)) + 1)
+    canvas_vitesse.draw()  # Redessine le graphique sur le canevas
+
+    # Mise à jour du graphique de la force subie par le grimpeur
+    ax_force.clear()
+    ax_force.plot(temps, forces_grimpeur_sans_slack, label="Sans slack", color='blue')
+    ax_force.plot(temps, forces_grimpeur_avec_slack, label="Avec slack", color='green')
+    ax_force.plot(temps, forces_grimpeur_assureur_saut, label="Assureur saute", color='red')
+    ax_force.set_xlabel("Temps (s)")
+    ax_force.set_ylabel("Force subie (N)")
+    ax_force.legend()
+    ax_force.set_ylim(0, max(max(forces_grimpeur_sans_slack), max(forces_grimpeur_avec_slack), max(forces_grimpeur_assureur_saut)) + 100)
+    canvas_force.draw()  # Redessine le graphique sur le canevas
+
+    # Configuration de l'animation pour les trois situations
+    ax_anim.clear()
+    ax_anim.set_xlim(0, 10)  # Limites des axes pour l'animation
+    ax_anim.set_ylim(0, longueur_corde + slack)  # Assure que l'axe y montre toute la chute et le slack
+    grimpeur_sans_slack, = ax_anim.plot([], [], 'bo', markersize=10, label="Sans slack")  # Création du grimpeur sans slack
+    grimpeur_avec_slack, = ax_anim.plot([], [], 'go', markersize=10, label="Avec slack")  # Création du grimpeur avec slack
+    grimpeur_assureur_saut, = ax_anim.plot([], [], 'ro', markersize=10, label="Assureur saute")  # Création du grimpeur avec assureur qui saute
+    assureur_saut, = ax_anim.plot([], [], 'ks', markersize=12, label="Assureur")  # Assureur position fixe
+
+    # Création des cordes (lignes entre grimpeur et assureur)
+    corde_sans_slack, = ax_anim.plot([], [], 'b-', lw=2)
+    corde_avec_slack, = ax_anim.plot([], [], 'g-', lw=2)
+    corde_assureur_saut, = ax_anim.plot([], [], 'r-', lw=2)
+
+    ax_anim.legend()
+
+    # Mise à jour de l'animation pour les 3 situations
+    def update(frame):
+        # Mise à jour des positions pour chaque cas
+        grimpeur_a.set_data([5], [max(positions_a[frame], 0)])  # Grimpeur sans slack
+        grimpeur_b.set_data([5.2], [max(y_positions_grimpeur_avec_slack[frame], 0)])  # Grimpeur avec slack
+        grimpeur_c.set_data([4.8], [max(y_positions_grimpeur_assureur_saut[frame], 0)])  # Grimpeur avec assureur qui saute
+        assureur_saut.set_data([5], [y_assureur_saut])  # Position du assureur qui saute
+
+        # Mise à jour des cordes
+        corde_sans_slack.set_data([5, 5], [max(y_positions_grimpeur_sans_slack[frame], 0), longueur_corde])  # Corde sans slack
+        corde_avec_slack.set_data([5.2, 5.2], [max(y_positions_grimpeur_avec_slack[frame], 0), longueur_corde + slack])  # Corde avec slack
+        corde_assureur_saut.set_data([4.8, 4.8], [max(y_positions_grimpeur_assureur_saut[frame], 0), longueur_corde + y_assureur_saut])  # Corde avec assureur qui saute
+
+        return grimpeur_sans_slack, grimpeur_avec_slack, grimpeur_assureur_saut, assureur_saut, corde_sans_slack, corde_avec_slack, corde_assureur_saut
+
+    # Paramétrage de l'animation
+    ani = animation.FuncAnimation(fig_anim, update, frames=n_frames, interval=temps_total * 1000 / n_frames, blit=True)
+    canvas_anim.draw()  # Crée une animation en appelant la fonction update à chaque frame.
+
+# Initialisation de la fenêtre Tkinter
+root = tk.Tk()
+root.title("Simulation de chute en escalade")
+
+tk.Label(root, text='Masse du grimpeur (kg)').pack()
+choixmasse = tk.Spinbox(root, from_=50, to=150, increment=0.5, width=5)
+choixmasse.pack()
+
+tk.Label(root, text='Longueur de la corde (m)').pack()
+longueurcorde = tk.Spinbox(root, from_=25, to=100, increment=0.5, width=5)
+longueurcorde.pack()
+
+tk.Label(root, text='Slack (m)').pack()
+slack_entry = tk.Entry(root)
+slack_entry.insert(0, "0")
+slack_entry.pack()
+
+# Bouton démarrage de la simulation
+btLancer = tk.Button(root, text="Lancer la simulation", command=lambda: start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_force, canvas_force))  # Commande pour lancer l'animation
+btLancer.pack()  # Ce bouton déclenche l'exécution de la fonction start_animation lorsqu'on clique dessus.
+
+# Création des graphiques et du canevas
+frame_left = tk.Frame(root)
+frame_left.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
+
+fig_pos, ax_pos = plt.subplots()
+canvas_pos = FigureCanvasTkAgg(fig_pos, master=frame_left)
+canvas_pos.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+fig_vitesse, ax_vitesse = plt.subplots()
+canvas_vitesse = FigureCanvasTkAgg(fig_vitesse, master=frame_left)
+canvas_vitesse.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+fig_anim, ax_anim = plt.subplots()
+canvas_anim = FigureCanvasTkAgg(fig_anim, master=root)
+canvas_anim.get_tk_widget().pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
+
+frame_right = tk.Frame(root)
+frame_right.pack(side=tk.RIGHT, fill=tk.BOTH, expand=1)
+
+fig_force, ax_force = plt.subplots()
+canvas_force = FigureCanvasTkAgg(fig_force, master=frame_right)
+canvas_force.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+# Bouton quitter l'application
+btQuit = tk.Button(root, text='Quitter', command=root.destroy)
+btQuit.pack(side=tk.BOTTOM, padx=10, pady=10)
+
+root.mainloop()  # Cette ligne démarre la boucle principale de tkinter. Elle est nécessaire pour que l'interface graphique fonctionne et reste responsive. Tant que l'utilisateur n'a pas fermé la fenêtre, la boucle tourne et attend les interactions de l'utilisateur.
