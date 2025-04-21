@@ -17,7 +17,7 @@ choixmasse = tk.Spinbox(frame_controls, from_=50, to=150, increment=0.5, width=5
 choixmasse.pack()
 
 tk.Label(frame_controls, text='Longueur de la corde (m)').pack()
-longueurcorde = tk.Spinbox(frame_controls, from_=5, to=100, increment=0.5, width=5)
+longueurcorde = tk.Spinbox(frame_controls, from_=15, to=100, increment=0.5, width=5)
 longueurcorde.pack()
 
 tk.Label(frame_controls, text='Corde supplémentaire/mou (m)').pack()
