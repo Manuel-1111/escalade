@@ -1,3 +1,6 @@
+##le code marche et ne fait pas bugger l'animation, je n'arrives pas à rendre e texte visible ou non et les légendes des graphiques sont peu lisibles
+
+
 import numpy as np
 import matplotlib.pyplot as plt
 import tkinter as tk
