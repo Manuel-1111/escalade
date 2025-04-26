@@ -1,3 +1,6 @@
+##le code marche et ne fait pas bugger l'animation, je n'arrives pas à rendre e texte visible ou non et les légendes des graphiques sont peu lisibles
+
+
 import numpy as np
 import matplotlib.pyplot as plt
 import tkinter as tk
@@ -68,6 +71,7 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
         y = 0
         v = 0
         t = 0
+        
         pos, vit, temps, force = [], [], [], []
 
         while t < Tmax:
@@ -79,6 +83,7 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
             v += a * dt
             y += v * dt
             t += dt
+            
 
             # Limiter la position du grimpeur à y >= 0
             if y < 0:
@@ -89,7 +94,7 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
             vit.append(v)
             temps.append(t)
             force.append(m * g - F_spring - F_damping)
-
+            
         return temps, pos, vit, force
 
     temps_a, positions_a, vitesses_a, force_a = simulate_chute(L0)
@@ -134,34 +139,95 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
 
     # --- Animation ---
     ax_anim.clear()
-    ax_anim.set_xlim(0, 10)
-    ax_anim.set_ylim(L0 + slack + 2, -1)  # Afficher la position sans dépasser 0
+    ax_anim.set_xlim(1, 9)
+    ax_anim.set_ylim(L0 + slack + 2, -2)
+
+    x_sans_mou = 3
+    x_avec_mou = 5
+    x_assureur_saut = 7
+    
+    # Fond d’écran (si l’image existe)
+    if os.path.exists("mur_escalade.jpg"):
+        img = mpimg.imread("mur_escalade.jpg")
+        ax_anim.imshow(img, extent=[0, 10, -2, L0 + slack + 2], aspect='auto', zorder=0, origin='upper')
+
+
+    # Dégaines (points fixes à y=0)
+    ax_anim.plot([x_sans_mou, x_avec_mou, x_assureur_saut], [0, 0, 0], '^', color='black', markersize=10, label="Dégaine")
+
+    # Grimpeurs
     grimpeur_sans_mou, = ax_anim.plot([], [], 'bo', markersize=10, label="Sans mou")
     grimpeur_avec_mou, = ax_anim.plot([], [], 'go', markersize=10, label="Avec mou")
     grimpeur_assureur_saut, = ax_anim.plot([], [], 'ro', markersize=10, label="Assureur saute")
-    assureur_saut, = ax_anim.plot([4.8], [L0 + saut_assureur], 'ks', markersize=12, label="Assureur")
-    corde_sans_mou, = ax_anim.plot([], [], 'b-', lw=2)
-    corde_avec_mou, = ax_anim.plot([], [], 'g-', lw=2)
-    corde_assureur_saut, = ax_anim.plot([], [], 'r-', lw=2)
-    ax_anim.legend()
+
+    # Assureurs
+    assureur_sans_mou, = ax_anim.plot([x_sans_mou], [L0], 'ks', markersize=10)
+    assureur_avec_mou, = ax_anim.plot([x_avec_mou], [L0 + slack], 'ks', markersize=10)
+    assureur_saut, = ax_anim.plot([], [], 'ks', markersize=10, label="Assureur")
+
+    # Cordes (2 segments par grimpeur)
+    corde1_sans_mou, = ax_anim.plot([], [], 'b-', lw=2)
+    corde2_sans_mou, = ax_anim.plot([], [], 'b-', lw=2)
+
+    corde1_avec_mou, = ax_anim.plot([], [], 'g-', lw=2)
+    corde2_avec_mou, = ax_anim.plot([], [], 'g-', lw=2)
+
+    corde1_assureur_saut, = ax_anim.plot([], [], 'r-', lw=2)
+    corde2_assureur_saut, = ax_anim.plot([], [], 'r-', lw=2)
+
+    ax_anim.legend(fontsize=10)
 
     n_frames = len(positions_a)
 
     def update(frame):
         if frame >= n_frames:
             return []
-        grimpeur_sans_mou.set_data([5], [positions_a[frame]])
-        grimpeur_avec_mou.set_data([5.2], [positions_b[frame]])
-        grimpeur_assureur_saut.set_data([4.8], [positions_c[frame]])
-        corde_sans_mou.set_data([5, 5], [positions_a[frame], L0])
-        corde_avec_mou.set_data([5.2, 5.2], [positions_b[frame], L0 + slack])
-        corde_assureur_saut.set_data([4.8, 4.8], [positions_c[frame], L0 + saut_assureur])
-        return grimpeur_sans_mou, grimpeur_avec_mou, grimpeur_assureur_saut, corde_sans_mou, corde_avec_mou, corde_assureur_saut
 
-    ani = animation.FuncAnimation(
-        fig_anim, update, frames=n_frames, interval=5, blit=True  # Augmenter l'intervalle ici
-    )
+        # Positions verticales
+        y_a = positions_a[frame]
+        y_b = positions_b[frame]
+        y_c = positions_c[frame]
+        y_assureur_c = L0 + saut_assureur if frame >= int(0.5 / dt) else L0 + saut_assureur * frame * dt / 0.5
+
+        # Mise à jour grimpeurs
+        grimpeur_sans_mou.set_data([x_sans_mou], [y_a])
+        grimpeur_avec_mou.set_data([x_avec_mou], [y_b])
+        grimpeur_assureur_saut.set_data([x_assureur_saut], [y_c])
+
+        # Mise à jour assureur saute
+        assureur_saut.set_data([x_assureur_saut], [y_assureur_c])
+
+        # Mise à jour cordes
+        corde1_sans_mou.set_data([x_sans_mou, x_sans_mou], [y_a, 0])
+        corde2_sans_mou.set_data([x_sans_mou, x_sans_mou], [0, L0])
+
+        corde1_avec_mou.set_data([x_avec_mou, x_avec_mou], [y_b, 0])
+        corde2_avec_mou.set_data([x_avec_mou, x_avec_mou], [0, L0 + slack])
+
+        corde1_assureur_saut.set_data([x_assureur_saut, x_assureur_saut], [y_c, 0])
+        corde2_assureur_saut.set_data([x_assureur_saut, x_assureur_saut], [0, y_assureur_c])
+
+        return (
+            grimpeur_sans_mou, grimpeur_avec_mou, grimpeur_assureur_saut,
+            assureur_saut,
+            corde1_sans_mou, corde2_sans_mou,
+            corde1_avec_mou, corde2_avec_mou,
+            corde1_assureur_saut, corde2_assureur_saut
+        )
+
+    ani = animation.FuncAnimation(fig_anim, update, frames=n_frames, interval=5, blit=True)
     canvas_anim.draw()
+
+
+    def texte_danger():
+        danger = 'false'
+        for i in force_b:
+            if i > 14000:
+                danger = 'true'
+        if danger == 'true':
+            texte.insert(1.0, "Danger, risque de fracture")
+        else:
+            texte.insert(1.0, "Pas de risque majeur")
 
 # --- Bouton lancer la simulation ---
 btLancer = tk.Button(frame_controls, text="Lancer la simulation", command=lambda: start_animation(
@@ -170,9 +236,16 @@ btLancer = tk.Button(frame_controls, text="Lancer la simulation", command=lambda
 ))
 btLancer.pack(pady=10)
 
+# --- Texte indiquant si la chute est trop sévère ---
+
+texte = tk.Text(root, height=100, width=500)
+texte.pack(side=tk.TOP)
+
+
+
 # --- Bouton quitter ---
 btQuit = tk.Button(root, text='Quitter', command=root.destroy)
 btQuit.pack(side=tk.BOTTOM, padx=10, pady=10)
 
 # --- Lancement de l'interface ---
-root.mainloop()
+root.mainloop() 
