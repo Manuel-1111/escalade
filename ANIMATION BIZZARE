@@ -140,7 +140,7 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
     # --- Animation ---
     ax_anim.clear()
     ax_anim.set_xlim(1, 9)
-    ax_anim.set_ylim(L0 + slack + 2, -2)
+    ax_anim.set_ylim(L0 + slack + 2, -8)
 
     x_sans_mou = 3
     x_avec_mou = 5
