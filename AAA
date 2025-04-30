@@ -65,6 +65,7 @@ texte = tk.Text(root, height=100, width=500)
 texte.pack(side=tk.TOP)
 
 # --- Fonction principale ---
+
 def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_force, canvas_force, canvas_anim, fig_anim):
     longueur_corde = float(longueurcorde.get()) #récupère la valeur choisit par l'utilisateur pour la longueur de la corde  
     poids_grimpeur = float(choixmasse.get()) #récupère la valeur choisit par l'utilisateur pour la masse du grimpeur 
@@ -90,8 +91,8 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
         while t < Tmax: # tant que le temps de la simulation est inférieur à celui du temps maximal fixé alors :
             y_ancrage = mouvement_point_fixe(t) if mouvement_point_fixe else 0
             extension = y - y_ancrage - L0_effectif # allongement de la corde 
-            F_spring = -k * extension if extension > 0 else 0
-            F_damping = -b * v if extension > 0 else 0
+            F_spring = -k * extension if extension > 0 else 0 #  ressort ( force élastique de la corde) , lorsque le ressort est tendue il suit une loi de Hook
+            F_damping = -b * v if extension > 0 else 0  #amortissemnt linéaire visqueux 
             a = (m * g + F_spring + F_damping) / m # calcul de l'accélération, un PFD a était fait manuellement pour trouver cette fonction
             v += a * dt
             y += v * dt
