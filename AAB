@@ -117,10 +117,10 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
 
     def mouvement_assureur(t,L0): # modélise le saut que ferait l'assureur en freinant la chute de son camarade
         t0 = (2*L0/9.81)**(1/2)
-        if t> t0 and t< 2*t0:
+        if t> t0 and t< 3*t0:
             return -2*(t-t0)
-        if t>= 2*t0:
-            return -2*t0
+        if t>= 3*t0:
+            return -4*t0
         else:
             return 0
 
@@ -207,7 +207,8 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
         y_a = positions_a[frame]
         y_b = positions_b[frame]
         y_c = positions_c[frame]
-        y_assureur_c = L0 + 10 + mouvement_assureur(frame*0.005,L0)
+        t0 = (2*L0/9.81)**(1/2)
+        y_assureur_c = L0 + 10 + mouvement_assureur(frame*0.005,L0) if frame*0.005<2*t0 else L0 + 10 - 2*t0
 
         # Mise à jour des données de la position des grimpeurs
         grimpeur_sans_mou.set_data([x_sans_mou], [y_a])
