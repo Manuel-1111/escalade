@@ -216,12 +216,13 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
         y_b = max(0, positions_b[frame])
         y_c = max(0, positions_c[frame])
         t = frame * dt     # Mettre à jour l'image avec les nouvelles données à un instant t
-        t0 = (L0 / g) ** 0.5 / 2
-        y_assureur_c = L0 + 10 + mouvement_assureur(t, L0) if t < 2 * t0 else L0 + 10 - 2 * t0     #
+        y_assureur_c = L0 + 10 + mouvement_assureur(t, L0)    #L'assureur part de sa position initiale (L0 + 10) puis saute selon le programme "mouvement_assureur" écrit plus tôt
 
+        #Positions fixes des assureurs
         y_assureur_a = L0 + 10 
         y_assureur_b = L0 + 10
 
+        #Mise à jour des positions des grimpeurs
         grimpeur_sans_mou.set_data([x_sans_mou], [y_a])
         grimpeur_avec_mou.set_data([x_avec_mou], [y_b])
         grimpeur_assureur_saut.set_data([x_assureur_saut], [y_c])
@@ -245,21 +246,24 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
             corde1_sans_mou, corde2_sans_mou,
             corde1_avec_mou, corde2_avec_mou,
             corde1_assureur_saut, corde2_assureur_saut
-        )
+        )                                                    #Sortie de la fonction
 
-    danger = any(f > 6000 for f in force_b)
-    message = "Danger, chute douloureuse\n" if danger else "Pas de risque pour le grimpeur\n"
-    texte.delete(1.0, tk.END)
-    texte.insert(tk.END, message)
+    ani = animation.FuncAnimation(fig_anim, update, frames=n_frames, interval=5, blit=True)    #Fonction animation qui est gérée par la librairie associée avec les variables définies
+    canvas_anim.draw()    #Force le programme a tracer l'animation sur l'interface
 
-    ani = animation.FuncAnimation(fig_anim, update, frames=n_frames, interval=5, blit=True)
-    canvas_anim.draw()
 
+# --- Fonction qui indique si le choc est trop sévère pour le grimpeur ---
+    danger = any(f > 6000 for f in force_b)    #Si la force subie dépasse 6 kN, le message s'affiche
+    message = "Danger, chute douloureuse\n" if danger else "Pas de risque pour le grimpeur\n"    #Contenu du message
+    texte.delete(1.0, tk.END)    #Prépare la zone d'affichage en la rendant vierge 
+    texte.insert(tk.END, message)    #Place le message dans le cadre de contrôle
+
+    
 
 
 # --- Zone de message ---
-frame_message = ttk.Frame(frame_controls)
-frame_message.pack(pady=10, fill='x')
+frame_message = ttk.Frame(frame_controls)     # Création cadre de message
+frame_message.pack(pady=10, fill='x')    #afficher le cadre de message avec les caractéristiques voulues
 
 texte = tk.Text(frame_message, height=3, width=50, bg="#f7f7f7", fg="#111", font=("Helvetica", 15))
 texte.pack()
