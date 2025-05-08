@@ -21,8 +21,8 @@ choixmasse = tk.Spinbox(frame_controls, from_=50, to=150, increment=0.5, width=5
 choixmasse.pack()
 
 # Ajout dans le cadre d'un menu où l'utilisateur choisit la longueur de la corde
-tk.Label(frame_controls, text='Longueur de la corde (m)').pack()
-longueurcorde = tk.Spinbox(frame_controls, from_=15, to=100, increment=0.5, width=5)
+tk.Label(frame_controls, text='Longueur de la corde à partir de la dernière dégaine (m)').pack()
+longueurcorde = tk.Spinbox(frame_controls, from_=2, to=50, increment=0.5, width=5)
 longueurcorde.pack()
 
 # Ajout dans le cadre d'un menu où l'utilisateur choisit la longueur du mou donné au grimpeur lors de sa chute
@@ -61,7 +61,6 @@ canvas_force.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 # Charger l'image de fond
 background_image = plt.imread('mur_escalade.jpg')
 
-# --- Fonction principale ---
 def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_force, canvas_force, canvas_anim, fig_anim):
     longueur_corde = float(longueurcorde.get())
     poids_grimpeur = float(choixmasse.get())
@@ -147,33 +146,24 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
     ax_force.set_ylim(0, max(max(force_a), max(force_b), max(force_c)) + 100)
     canvas_force.draw()
 
-       ## --- Animation ---
+    ## --- Animation ---
     ax_anim.clear()
     ax_anim.set_xlim(1, 9)
-    ax_anim.set_ylim(40, -10)  # FIXED AXIS
-    ax_anim.imshow(background_image, extent=[1, 9, 40, -10], aspect='auto')
+    ax_anim.set_ylim(L0 + 11, -10)  # FIXER AXE
+    ax_anim.imshow(background_image, extent=[1, 9, L0 + 11, -10], aspect='auto')
 
     x_sans_mou = 3
     x_avec_mou = 5
     x_assureur_saut = 7
 
-    # Espacement fixe des dégaines (tous les 5 mètres)
-    espacement_degaine = 5  # mètres
-    nb_degaine = 3
-
     # Dégaines pour "Sans mou"
-    for i in range(nb_degaine):
-        ax_anim.plot(x_sans_mou, espacement_degaine * (i + 1), '^', color='black', markersize=8)
+    ax_anim.plot(x_sans_mou, 1, '^', color='black', markersize=8, label="Dégaines")
 
     # Dégaines pour "Avec mou"
-    for i in range(nb_degaine):
-        ax_anim.plot(x_avec_mou, espacement_degaine * (i + 1), '^', color='black', markersize=8)
+    ax_anim.plot(x_avec_mou, 1, '^', color='black', markersize=8)
 
     # Dégaines pour "Assureur saute"
-    for i in range(nb_degaine):
-        ax_anim.plot(x_assureur_saut, espacement_degaine * (i + 1), '^', color='black', markersize=8)
-    # Ajouter une entrée légendaire pour les dégaines
-    degaine_legende, = ax_anim.plot([], [], '^', color='black', markersize=8, label="Dégaines")
+    ax_anim.plot(x_assureur_saut, 1, '^', color='black', markersize=8)
 
     grimpeur_sans_mou, = ax_anim.plot([], [], 'bo', markersize=10, label="Sans mou")
     grimpeur_avec_mou, = ax_anim.plot([], [], 'go', markersize=10, label="Avec mou")
@@ -184,7 +174,7 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
     assureur_statique2, = ax_anim.plot([x_avec_mou + 1], [L0 + 10], 'ks', markersize=10)
     assureur_saut, = ax_anim.plot([], [], 'ks', markersize=10)
 
-    ax_anim.legend(fontsize=10)
+    ax_anim.legend(loc='lower right', fontsize=10)
 
     corde1_sans_mou, = ax_anim.plot([], [], 'b-', lw=2)
     corde2_sans_mou, = ax_anim.plot([], [], 'b-', lw=2)
@@ -195,8 +185,6 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
     corde1_assureur_saut, = ax_anim.plot([], [], 'r-', lw=2)
     corde2_assureur_saut, = ax_anim.plot([], [], 'r-', lw=2)
 
-
-    ax_anim.legend(fontsize=10)
     n_frames = len(positions_a)
 
     def update(frame):
@@ -219,24 +207,22 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
 
         assureur_saut.set_data([x_assureur_saut + 1], [y_assureur_c])
 
-        corde1_sans_mou.set_data([x_sans_mou, x_sans_mou], [y_a, 0])
-        corde2_sans_mou.set_data([x_sans_mou + 1, x_sans_mou], [y_assureur_a, 0])
+        corde1_sans_mou.set_data([x_sans_mou, x_sans_mou], [y_a, 1])
+        corde2_sans_mou.set_data([x_sans_mou + 1, x_sans_mou], [y_assureur_a, 1])
 
-        corde1_avec_mou.set_data([x_avec_mou, x_avec_mou], [y_b, 0])
-        corde2_avec_mou.set_data([x_avec_mou + 1, x_avec_mou], [y_assureur_b, 0])
+        corde1_avec_mou.set_data([x_avec_mou, x_avec_mou], [y_b, 1])
+        corde2_avec_mou.set_data([x_avec_mou + 1, x_avec_mou], [y_assureur_b, 1])
 
-        corde1_assureur_saut.set_data([x_assureur_saut, x_assureur_saut], [y_c, 0])
-        corde2_assureur_saut.set_data([x_assureur_saut + 1, x_assureur_saut], [y_assureur_c, 0])
+        corde1_assureur_saut.set_data([x_assureur_saut, x_assureur_saut], [y_c, 1])
+        corde2_assureur_saut.set_data([x_assureur_saut + 1, x_assureur_saut], [y_assureur_c, 1])
 
         return (
-        grimpeur_sans_mou, grimpeur_avec_mou, grimpeur_assureur_saut,
-        assureur_saut,
-        corde1_sans_mou, corde2_sans_mou,
-        corde1_avec_mou, corde2_avec_mou,
-        corde1_assureur_saut, corde2_assureur_saut
-    )
-
-    
+            grimpeur_sans_mou, grimpeur_avec_mou, grimpeur_assureur_saut,
+            assureur_saut,
+            corde1_sans_mou, corde2_sans_mou,
+            corde1_avec_mou, corde2_avec_mou,
+            corde1_assureur_saut, corde2_assureur_saut
+        )
 
     danger = any(f > 14000 for f in force_b)
     message = "⚠️ Danger, risque de fracture pour le grimpeur (avec mou)\n" if danger else "✅ Pas de risque majeur pour le grimpeur (avec mou)\n"
@@ -245,6 +231,7 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
 
     ani = animation.FuncAnimation(fig_anim, update, frames=n_frames, interval=5, blit=True)
     canvas_anim.draw()
+
 
 
 # --- Zone de message ---
