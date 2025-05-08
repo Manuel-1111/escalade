@@ -272,8 +272,8 @@ texte.pack()
 btLancer = tk.Button(frame_controls, text="Lancer la simulation", command=lambda: start_animation(
     ax_pos, canvas_pos, ax_vitesse, canvas_vitesse,
     ax_anim, ax_force, canvas_force, canvas_anim, fig_anim
-))
-btLancer.pack(pady=10)
+))    # Appelle la fonction start_animation pour lance la simulation 
+btLancer.pack(pady=10)     # position dans la fenetre de controle
 
 # --- Bouton quitter ---
 btQuit = tk.Button(root, text='Quitter', command=root.destroy)
