@@ -122,7 +122,7 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
     ax_pos.set_xlabel("Temps (s)")
     ax_pos.set_ylabel("Position (m)")
     ax_pos.legend()
-    ax_pos.set_ylim(-10, L0 + slack + 2)
+    ax_pos.set_ylim(-1, L0 + slack + 2)
     canvas_pos.draw()
 
     ax_vitesse.clear()
@@ -149,8 +149,8 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
     ## --- Animation ---
     ax_anim.clear()
     ax_anim.set_xlim(1, 9)
-    ax_anim.set_ylim(L0 + 11, -10)  # FIXER AXE
-    ax_anim.imshow(background_image, extent=[1, 9, L0 + 11, -10], aspect='auto')
+    ax_anim.set_ylim(L0 + 11, -5)  # FIXER AXE
+    ax_anim.imshow(background_image, extent=[1, 9, L0 + 11, -5], aspect='auto')
 
     x_sans_mou = 3
     x_avec_mou = 5
@@ -174,7 +174,7 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
     assureur_statique2, = ax_anim.plot([x_avec_mou + 1], [L0 + 10], 'ks', markersize=10)
     assureur_saut, = ax_anim.plot([], [], 'ks', markersize=10)
 
-    ax_anim.legend(loc='lower right', fontsize=10)
+    ax_anim.legend(loc='lower left', fontsize=9)
 
     corde1_sans_mou, = ax_anim.plot([], [], 'b-', lw=2)
     corde2_sans_mou, = ax_anim.plot([], [], 'b-', lw=2)
@@ -224,8 +224,8 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
             corde1_assureur_saut, corde2_assureur_saut
         )
 
-    danger = any(f > 14000 for f in force_b)
-    message = "⚠️ Danger, risque de fracture pour le grimpeur (avec mou)\n" if danger else "✅ Pas de risque majeur pour le grimpeur (avec mou)\n"
+    danger = any(f > 6000 for f in force_b)
+    message = "Danger, chute douloureuse\n" if danger else "Pas de risque pour le grimpeur\n"
     texte.delete(1.0, tk.END)
     texte.insert(tk.END, message)
 
@@ -238,7 +238,7 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
 frame_message = ttk.Frame(frame_controls)
 frame_message.pack(pady=10, fill='x')
 
-texte = tk.Text(frame_message, height=6, width=70, bg="#f7f7f7", fg="#111", font=("Helvetica", 10))
+texte = tk.Text(frame_message, height=3, width=50, bg="#f7f7f7", fg="#111", font=("Helvetica", 15))
 texte.pack()
 
 # --- Bouton lancer la simulation ---
