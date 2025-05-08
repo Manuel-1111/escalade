@@ -13,8 +13,8 @@ root = tk.Tk()     # Créer une machine permettant de supporter différents grap
 root.title("Simulation de chute en escalade")     #Titre de la fenêtre
 
 # --- Cadre de contrôle gris (en haut) ---
-frame_controls = tk.Frame(root)
-frame_controls.pack(side=tk.TOP, pady=10)
+frame_controls = tk.Frame(root) # affichage du cadre 
+frame_controls.pack(side=tk.TOP, pady=10) # affichage du cadre
 
     #Ajout dans le cadre d'un menu ou l'utilisateur choisit la masse du grimpeur
 
@@ -34,10 +34,10 @@ slack_entry.insert(0, "0")    #Valeur par défaut
 slack_entry.pack()    # Disposition dans le cadre de control 
 
 # --- Cadres pour affichage des graphiques ---
-frame_left = tk.Frame(root)     #Créer des cadres pour les graphique dans l'interface sur la gauche de cell-ci
+frame_left = tk.Frame(root)     #Créer des cadres pour les graphique dans l'interface sur la gauche de celle-ci
 frame_left.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)     
 
-frame_right = tk.Frame(root)    #séparation à droite de la fenetre 
+frame_right = tk.Frame(root)    #Créer des cadres pour les graphique dans l'interface sur la droite de celle-ci
 frame_right.pack(side=tk.RIGHT, fill=tk.BOTH, expand=1)
 
 # --- Graphiques matplotlib ---
