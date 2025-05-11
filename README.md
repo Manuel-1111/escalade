@@ -24,7 +24,7 @@ choixmasse.pack() # disposition de la boite dans la fenetre
 
     # Ajout dans le cadre d'un menu où l'utilisateur choisit la longueur de la corde
 tk.Label(frame_controls, text='Longueur de la corde à partir de la dernière dégaine (m)',bg="#add8e6").pack()     # Titre de la boite "spinbox" 
-longueurcorde = tk.Spinbox(frame_controls, from_=2, to=50, increment=0.5, width=5)    #choix de la longueur de la corde à partir de la dégaine avec un incrément de 0.5m / dimension et placement de la boite 
+longueurcorde = tk.Spinbox(frame_controls, from_=1, to=20, increment=0.5, width=5)    #choix de la longueur de la corde à partir de la dégaine avec un incrément de 0.5m / dimension et placement de la boite 
 longueurcorde.pack()
 
     # Ajout dans le cadre d'un menu où l'utilisateur choisit la longueur du mou donné au grimpeur lors de sa chute
@@ -74,14 +74,17 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
     #Constantes
     m = poids_grimpeur
     g = 9.81
-    L0 = longueur_corde
-    k = 1500    #Constante de raideur de la corde
-    b = 2 * np.sqrt(m * k)    #Coef d'amortissement en régime critique
+    L0 = 2*longueur_corde
+    
     dt = 0.005    #Pas de temps
     Tmax = 5    #Durée totale de l'animation
 
-    def simulate_chute(L0_effectif, mouvement_point_fixe=None):    #fonction qui permet de déterminer à chaque instant la position, la vitesse et les forces appliquées sur le grimpeur
+    def simulate_chute(L0_effectif, mou, mouvement_point_fixe=None):    #fonction qui permet de déterminer à chaque instant la position, la vitesse et les forces appliquées sur le grimpeur
         #initialisation des données, on considère le grimpeur comme un point fixe avant sa chute
+
+        k = 78000/(L0_effectif/2 + mou + 10)   #Constante de raideur de la corde
+        b = 2 * np.sqrt(m * k)    #Coef d'amortissement en régime critique
+ 
         y = 0    
         v = 0
         t = 0
@@ -114,9 +117,9 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
         else:
             return 0    #Il reste au sol avant le freinage
 
-    temps_a, positions_a, vitesses_a, force_a = simulate_chute(L0)    #valeurs calculées lorsqu'il n'y pas de mou 
-    temps_b, positions_b, vitesses_b, force_b = simulate_chute(L0 + slack)    #  valeurs calculées lorsqu'il y a du mou qui est donné par l'assureur  
-    temps_c, positions_c, vitesses_c, force_c = simulate_chute(L0, mouvement_assureur)    #valeurs calculées lorsque l'assureur saute 
+    temps_a, positions_a, vitesses_a, force_a = simulate_chute(L0, 0)    #valeurs calculées lorsqu'il n'y pas de mou 
+    temps_b, positions_b, vitesses_b, force_b = simulate_chute(L0, slack)    #  valeurs calculées lorsqu'il y a du mou qui est donné par l'assureur  
+    temps_c, positions_c, vitesses_c, force_c = simulate_chute(L0, 0, mouvement_assureur)    #valeurs calculées lorsque l'assureur saute 
 
     # --- Graphiques ---
     # graphiques des positions en fonction du temps, les 3 listes de positions sont tracées sur le même graphique
@@ -160,8 +163,8 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
     ## --- Animation ---
     ax_anim.clear()    #Remise à 0 initiale
     ax_anim.set_xlim(1, 9)    #Dimensions du cadre de l'animation
-    ax_anim.set_ylim(L0 + 11, -5)    #Dimensions du cadre de l'animation, dépend de L0 pour s'adapter aux données initiales
-    ax_anim.imshow(background_image, extent=[1, 9, L0 + 11, -5], aspect='auto')    #Adapter le fond d'écran au cadre et aux données rentrées
+    ax_anim.set_ylim(L0 + 11, -2)    #Dimensions du cadre de l'animation, dépend de L0 pour s'adapter aux données initiales
+    ax_anim.imshow(background_image, extent=[1, 9, L0 + 11, -2], aspect='auto')    #Adapter le fond d'écran au cadre et aux données rentrées
 
     x_sans_mou = 3    #  position horizontale intiale des grimpeurs 
     x_avec_mou = 5
@@ -170,13 +173,13 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
     # Position des dégaines, à 1 mètre de la position intiale de chute des grimpeurs
     
     # Dégaines pour "Sans mou"
-    ax_anim.plot(x_sans_mou, 1, '^', color='black', markersize=8, label="Dégaines")   
+    ax_anim.plot(x_sans_mou, L0/2, '^', color='black', markersize=8, label="Dégaines")   
 
     # Dégaines pour "Avec mou"
-    ax_anim.plot(x_avec_mou, 1, '^', color='black', markersize=8)
+    ax_anim.plot(x_avec_mou, L0/2, '^', color='black', markersize=8)
 
     # Dégaines pour "Assureur saute"
-    ax_anim.plot(x_assureur_saut, 1, '^', color='black', markersize=8)
+    ax_anim.plot(x_assureur_saut, L0/2, '^', color='black', markersize=8)
 
     # Créations des objets "grimpeurs" et Introduction dans la légende 
     grimpeur_sans_mou, = ax_anim.plot([], [], 'bo', markersize=10, label="Sans mou")    #Création du grimpeur sans mou, représenté par un rond bleu
@@ -231,14 +234,14 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
         assureur_saut.set_data([x_assureur_saut + 1], [y_assureur_c])
 
         #Mise à jour de la longueur des cordes 
-        corde1_sans_mou.set_data([x_sans_mou, x_sans_mou], [y_a, 1])
-        corde2_sans_mou.set_data([x_sans_mou + 1, x_sans_mou], [y_assureur_a, 1])
+        corde1_sans_mou.set_data([x_sans_mou, x_sans_mou], [y_a, L0/2])
+        corde2_sans_mou.set_data([x_sans_mou + 1, x_sans_mou], [y_assureur_a, L0/2])
 
-        corde1_avec_mou.set_data([x_avec_mou, x_avec_mou], [y_b, 1])
-        corde2_avec_mou.set_data([x_avec_mou + 1, x_avec_mou], [y_assureur_b, 1])
+        corde1_avec_mou.set_data([x_avec_mou, x_avec_mou], [y_b, L0/2])
+        corde2_avec_mou.set_data([x_avec_mou + 1, x_avec_mou], [y_assureur_b, L0/2])
 
-        corde1_assureur_saut.set_data([x_assureur_saut, x_assureur_saut], [y_c, 1])
-        corde2_assureur_saut.set_data([x_assureur_saut + 1, x_assureur_saut], [y_assureur_c, 1])
+        corde1_assureur_saut.set_data([x_assureur_saut, x_assureur_saut], [y_c, L0/2])
+        corde2_assureur_saut.set_data([x_assureur_saut + 1, x_assureur_saut], [y_assureur_c, L0/2])
 
         return (
             grimpeur_sans_mou, grimpeur_avec_mou, grimpeur_assureur_saut,
@@ -253,7 +256,7 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
 
 
 # --- Fonction qui indique si le choc est trop sévère pour le grimpeur ---
-    danger = any(f > 6000 for f in force_b)    #Si la force subie dépasse 6 kN, le message s'affiche
+    danger = any(f > 10000 for f in force_b)    #Si la force subie dépasse 6 kN, le message s'affiche
     message = "⚠ Danger, chute douloureuse\n" if danger else "✓ Pas de risque pour le grimpeur\n"    #Contenu du message
     texte.delete(1.0, tk.END)    #Prépare la zone d'affichage en la rendant vierge 
     texte.insert(tk.END, "\n"+message +"\n","center")    #Place le message dans le cadre de contrôle
