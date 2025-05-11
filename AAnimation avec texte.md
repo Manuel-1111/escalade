@@ -110,7 +110,7 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
         return temps, pos, vit, force    # nous avons maintenant accès à ces données sous forme de listes
 
     def mouvement_assureur(t, L0):    # modélise le saut que ferait l'assureur en freinant la chute de son camarade
-        t0 = (L0 / g) ** 0.5 / 2  #Instant où l'assureur doit sauter, légèrement plus tôt que le moment où la corde se tend
+        t0 = (-1+(3/2)**0.5)*(L0 / g) ** 0.5  #Instant où l'assureur doit sauter, légèrement plus tôt que le moment où la corde se tend
         if t > t0 and t < 3 * t0:    #Saut durant toute la période de freinage
             return -2 * (t - t0)    #Il se déplace de 2 m/s
         if t >= 3 * t0:    #arrête le mouvement à la fin du freinage
