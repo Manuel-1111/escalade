@@ -80,10 +80,10 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
     dt = 0.005    #Pas de temps
     Tmax = 5    #Durée totale de l'animation
 
-    def simulate_chute(L0_effectif, mouvement_point_fixe=None):    #fonction qui permet de déterminer à chaque instant la position, la vitesse et les forces appliquées sur le grimpeur
+    def simulate_chute(L0_effectif, mou, mouvement_point_fixe=None):    #fonction qui permet de déterminer à chaque instant la position, la vitesse et les forces appliquées sur le grimpeur
         #initialisation des données, on considère le grimpeur comme un point fixe avant sa chute
 
-        k = 78000/(L0_effectif + 10)   #Constante de raideur de la corde
+        k = 78000/(L0_effectif + mou + 10)   #Constante de raideur de la corde
         b = 2 * np.sqrt(m * k)    #Coef d'amortissement en régime critique
         
         y = 0    
@@ -93,7 +93,7 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
 
         while t < Tmax:    # tant que le temps est inférieur à la durée totale de la simulation :
             y_ancrage = mouvement_point_fixe(t, L0) if mouvement_point_fixe else 0    #Place le point d'ancrage sur les assureurs (fixes ou mobiles)
-            extension = y - y_ancrage - L0_effectif    #Extension de la corde par rapport à sa longueur à vide
+            extension = y - y_ancrage - L0_effectif - mou   #Extension de la corde par rapport à sa longueur à vide
             F_spring = -k * extension if extension > 0 else 0    #Force de rappel de la corde
             F_damping = -b * v if extension > 0 else 0    #Force d'amortissement modélisée par un frottement fluide
             a = (m * g + F_spring + F_damping) / m    #Accélération calculée grâce au PFD
@@ -118,9 +118,9 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
         else:
             return 0    #Il reste au sol avant le freinage
 
-    temps_a, positions_a, vitesses_a, force_a = simulate_chute(L0)    #valeurs calculées lorsqu'il n'y pas de mou 
-    temps_b, positions_b, vitesses_b, force_b = simulate_chute(L0 + slack)    #  valeurs calculées lorsqu'il y a du mou qui est donné par l'assureur  
-    temps_c, positions_c, vitesses_c, force_c = simulate_chute(L0, mouvement_assureur)    #valeurs calculées lorsque l'assureur saute 
+    temps_a, positions_a, vitesses_a, force_a = simulate_chute(L0, 0)    #valeurs calculées lorsqu'il n'y pas de mou 
+    temps_b, positions_b, vitesses_b, force_b = simulate_chute(L0, slack)    #  valeurs calculées lorsqu'il y a du mou qui est donné par l'assureur  
+    temps_c, positions_c, vitesses_c, force_c = simulate_chute(L0, 0, mouvement_assureur)    #valeurs calculées lorsque l'assureur saute 
 
     # --- Graphiques ---
     # graphiques des positions en fonction du temps, les 3 listes de positions sont tracées sur le même graphique
