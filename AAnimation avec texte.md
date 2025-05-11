@@ -24,7 +24,7 @@ choixmasse.pack() # disposition de la boite dans la fenetre
 
     # Ajout dans le cadre d'un menu où l'utilisateur choisit la longueur de la corde
 tk.Label(frame_controls, text='Longueur de la corde à partir de la dernière dégaine (m)').pack()     # Titre de la boite "spinbox" 
-longueurcorde = tk.Spinbox(frame_controls, from_=2, to=50, increment=0.5, width=5)    #choix de la longueur de la corde à partir de la dégaine avec un incrément de 0.5m / dimension et placement de la boite 
+longueurcorde = tk.Spinbox(frame_controls, from_=1, to=20, increment=0.5, width=5)    #choix de la longueur de la corde à partir de la dégaine avec un incrément de 0.5m / dimension et placement de la boite 
 longueurcorde.pack()
 
     # Ajout dans le cadre d'un menu où l'utilisateur choisit la longueur du mou donné au grimpeur lors de sa chute
@@ -74,7 +74,7 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
     #Constantes
     m = poids_grimpeur
     g = 9.81
-    L0 = longueur_corde
+    L0 = longueur_corde *2
     
    
     dt = 0.005    #Pas de temps
@@ -83,7 +83,7 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
     def simulate_chute(L0_effectif, mou, mouvement_point_fixe=None):    #fonction qui permet de déterminer à chaque instant la position, la vitesse et les forces appliquées sur le grimpeur
         #initialisation des données, on considère le grimpeur comme un point fixe avant sa chute
 
-        k = 78000/(L0_effectif + mou + 10)   #Constante de raideur de la corde
+        k = 78000/(L0_effectif/2 + mou + 10)   #Constante de raideur de la corde
         b = 2 * np.sqrt(m * k)    #Coef d'amortissement en régime critique
         
         y = 0    
@@ -93,7 +93,7 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
 
         while t < Tmax:    # tant que le temps est inférieur à la durée totale de la simulation :
             y_ancrage = mouvement_point_fixe(t, L0) if mouvement_point_fixe else 0    #Place le point d'ancrage sur les assureurs (fixes ou mobiles)
-            extension = y - y_ancrage - L0_effectif   #Extension de la corde par rapport à sa longueur à vide
+            extension = y - y_ancrage - L0_effectif/2   #Extension de la corde par rapport à sa longueur à vide
             F_spring = -k * extension if extension > 0 else 0    #Force de rappel de la corde
             F_damping = -b * v if extension > 0 else 0    #Force d'amortissement modélisée par un frottement fluide
             a = (m * g + F_spring + F_damping) / m    #Accélération calculée grâce au PFD
@@ -174,13 +174,13 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
     # Position des dégaines, à 1 mètre de la position intiale de chute des grimpeurs
     
     # Dégaines pour "Sans mou"
-    ax_anim.plot(x_sans_mou, 1, '^', color='black', markersize=8, label="Dégaines")   
+    ax_anim.plot(x_sans_mou, L0/2, '^', color='black', markersize=8, label="Dégaines")   
 
     # Dégaines pour "Avec mou"
-    ax_anim.plot(x_avec_mou, 1, '^', color='black', markersize=8)
+    ax_anim.plot(x_avec_mou, L0/2, '^', color='black', markersize=8)
 
     # Dégaines pour "Assureur saute"
-    ax_anim.plot(x_assureur_saut, 1, '^', color='black', markersize=8)
+    ax_anim.plot(x_assureur_saut, L0/2, '^', color='black', markersize=8)
 
     # Créations des objets "grimpeurs" et Introduction dans la légende 
     grimpeur_sans_mou, = ax_anim.plot([], [], 'bo', markersize=10, label="Sans mou")    #Création du grimpeur sans mou, représenté par un rond bleu
@@ -235,14 +235,14 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
         assureur_saut.set_data([x_assureur_saut + 1], [y_assureur_c])
 
         #Mise à jour de la longueur des cordes 
-        corde1_sans_mou.set_data([x_sans_mou, x_sans_mou], [y_a, 1])
-        corde2_sans_mou.set_data([x_sans_mou + 1, x_sans_mou], [y_assureur_a, 1])
+        corde1_sans_mou.set_data([x_sans_mou, x_sans_mou], [y_a, L0/2])
+        corde2_sans_mou.set_data([x_sans_mou + 1, x_sans_mou], [y_assureur_a, L0/2])
 
-        corde1_avec_mou.set_data([x_avec_mou, x_avec_mou], [y_b, 1])
-        corde2_avec_mou.set_data([x_avec_mou + 1, x_avec_mou], [y_assureur_b, 1])
+        corde1_avec_mou.set_data([x_avec_mou, x_avec_mou], [y_b, L0/2])
+        corde2_avec_mou.set_data([x_avec_mou + 1, x_avec_mou], [y_assureur_b, L0/2])
 
-        corde1_assureur_saut.set_data([x_assureur_saut, x_assureur_saut], [y_c, 1])
-        corde2_assureur_saut.set_data([x_assureur_saut + 1, x_assureur_saut], [y_assureur_c, 1])
+        corde1_assureur_saut.set_data([x_assureur_saut, x_assureur_saut], [y_c, L0/2])
+        corde2_assureur_saut.set_data([x_assureur_saut + 1, x_assureur_saut], [y_assureur_c, L0/2])
 
         return (
             grimpeur_sans_mou, grimpeur_avec_mou, grimpeur_assureur_saut,
