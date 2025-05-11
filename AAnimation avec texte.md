@@ -257,7 +257,7 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
 
 
 # --- Fonction qui indique si le choc est trop sévère pour le grimpeur ---
-    danger = any(f > 6000 for f in force_b)    #Si la force subie dépasse 6 kN, le message s'affiche
+    danger = any(f > 10000 for f in force_b)    #Si la force subie dépasse 6 kN, le message s'affiche
     message = "Danger, chute douloureuse\n" if danger else "Pas de risque pour le grimpeur\n"    #Contenu du message
     texte.delete(1.0, tk.END)    #Prépare la zone d'affichage en la rendant vierge 
     texte.insert(tk.END, message)    #Place le message dans le cadre de contrôle
