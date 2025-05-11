@@ -75,13 +75,16 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
     m = poids_grimpeur
     g = 9.81
     L0 = longueur_corde
-    k = 1500    #Constante de raideur de la corde
+    
     b = 2 * np.sqrt(m * k)    #Coef d'amortissement en régime critique
     dt = 0.005    #Pas de temps
     Tmax = 5    #Durée totale de l'animation
 
     def simulate_chute(L0_effectif, mouvement_point_fixe=None):    #fonction qui permet de déterminer à chaque instant la position, la vitesse et les forces appliquées sur le grimpeur
         #initialisation des données, on considère le grimpeur comme un point fixe avant sa chute
+
+        k = 78000/(L0_effectif + 10)   #Constante de raideur de la corde
+        
         y = 0    
         v = 0
         t = 0
