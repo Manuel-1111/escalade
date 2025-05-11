@@ -163,7 +163,7 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
     ## --- Animation ---
     ax_anim.clear()    #Remise à 0 initiale
     ax_anim.set_xlim(1, 9)    #Dimensions du cadre de l'animation
-    ax_anim.set_ylim(L0 + 11, -2)    #Dimensions du cadre de l'animation, dépend de L0 pour s'adapter aux données initiales
+    ax_anim.set_ylim(L0 + 10.5, -2)    #Dimensions du cadre de l'animation, dépend de L0 pour s'adapter aux données initiales
     ax_anim.imshow(background_image, extent=[1, 9, L0 + 11, -2], aspect='auto')    #Adapter le fond d'écran au cadre et aux données rentrées
 
     x_sans_mou = 3    #  position horizontale intiale des grimpeurs 
