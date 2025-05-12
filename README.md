@@ -82,7 +82,7 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
     def simulate_chute(L0_effectif, mou, mouvement_point_fixe=None):    #fonction qui permet de déterminer à chaque instant la position, la vitesse et les forces appliquées sur le grimpeur
         #initialisation des données, on considère le grimpeur comme un point fixe avant sa chute
 
-        k = 78000/(L0_effectif/2 + mou + 10)   #Constante de raideur de la corde
+        k = 78000/(L0_effectif/2 + mou + 10)   #Constante de raideur de la corde, dépend de sa longueur
         b = 2 * np.sqrt(m * k)    #Coef d'amortissement en régime critique
  
         y = 0    
@@ -91,8 +91,10 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
         pos, vit, temps, force = [], [], [], []    #listes qui stockent les données calculées, initialement vides 
 
         while t < Tmax:    # tant que le temps est inférieur à la durée totale de la simulation :
-            y_ancrage = mouvement_point_fixe(t, L0) if mouvement_point_fixe else 0    #Place le point d'ancrage sur les assureurs (fixes ou mobiles)
+            y_ancrage = mouvement_point_fixe(t, L0) if mouvement_point_fixe else 0 #Place le point d'ancrage sur les assureurs (fixes ou mobiles)
+            
             extension = y - y_ancrage - L0_effectif    #Extension de la corde par rapport à sa longueur à vide
+    
             F_spring = -k * extension if extension > 0 else 0    #Force de rappel de la corde
             F_damping = -b * v if extension > 0 else 0    #Force d'amortissement modélisée par un frottement fluide
             a = (m * g + F_spring + F_damping) / m    #Accélération calculée grâce au PFD
@@ -109,11 +111,11 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
         return temps, pos, vit, force    # nous avons maintenant accès à ces données sous forme de listes
 
     def mouvement_assureur(t, L0):    # modélise le saut que ferait l'assureur en freinant la chute de son camarade
-        t0 = (L0 / g) ** 0.5 / 2  #Instant où l'assureur doit sauter, légèrement plus tôt que le moment où la corde se tend
-        if t > t0 and t < 3 * t0:    #Saut durant toute la période de freinage
-            return -2 * (t - t0)    #Il se déplace de 2 m/s
-        if t >= 3 * t0:    #arrête le mouvement à la fin du freinage
-            return -4 * t0    #Sa position reste constante
+        t0 = ((L0 *2 /g) ** 0.5 ) - 0.15  #Instant où l'assureur doit sauter, légèrement plus tôt que le moment où la corde se tend
+        if t > t0 and t < t0 + 0.2:    #Saut durant toute la période de freinage
+            return - 2* (t - t0)    #Il se déplace de 2 m/s
+        if t >= 0.2 + t0:    #arrête le mouvement à la fin du freinage
+            return -0.4   #Sa position reste constante
         else:
             return 0    #Il reste au sol avant le freinage
 
@@ -131,7 +133,7 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
     ax_pos.set_xlabel("Temps (s)")    # dénomination des axes
     ax_pos.set_ylabel("Position (m)")
     ax_pos.legend()    #Place le nom des axes
-    ax_pos.set_ylim(-1, L0 + slack + 2)    # valeurs limites pour l'axe vertical
+    ax_pos.set_ylim(-1, L0 +  2)    # valeurs limites pour l'axe vertical
     canvas_pos.draw()    # tracé du graphe
 
 
@@ -256,7 +258,7 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
 
 
 # --- Fonction qui indique si le choc est trop sévère pour le grimpeur ---
-    danger = any(f > 10000 for f in force_b)    #Si la force subie dépasse 6 kN, le message s'affiche
+    danger = any(f > 10000 for f in force_a)    #Si la force subie dépasse 6 kN, le message s'affiche
     message = "⚠ Danger, chute douloureuse\n" if danger else "✓ Pas de risque pour le grimpeur\n"    #Contenu du message
     texte.delete(1.0, tk.END)    #Prépare la zone d'affichage en la rendant vierge 
     texte.insert(tk.END, "\n"+message +"\n","center")    #Place le message dans le cadre de contrôle
