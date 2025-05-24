@@ -13,7 +13,7 @@ root = tk.Tk()     # Créer une machine permettant de supporter différents grap
 root.title("Simulation de chute en escalade")     #Titre de la fenêtre
 
 # --- Cadre de contrôle gris (en haut) ---
-frame_controls = tk.Frame(root, bg="#add8e6")  # Bleu clair # affichage du cadre 
+frame_controls = tk.Frame(root, bg="#add8e6")  # Bleu clair
 frame_controls.pack(side=tk.TOP, pady=10, fill='x') # affichage du cadre
 
     #Ajout dans le cadre d'un menu ou l'utilisateur choisit la masse du grimpeur
