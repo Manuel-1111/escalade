@@ -29,7 +29,7 @@ longueurcorde.pack()
 
     # Ajout dans le cadre d'un menu où l'utilisateur choisit la longueur du mou donné au grimpeur lors de sa chute
 tk.Label(frame_controls, text='Corde supplémentaire/mou (m)', bg="#add8e6").pack()    # Titre de la boite "spinbox" 
-slack_entry = tk.Entry(frame_controls)    #Entrée par l'utilisateur de la longueur du mou avec le clavier, avec un incrément de 0.5m 
+slack_entry = tk.Entry(frame_controls)    #Entrée par l'utilisateur de la longueur du mou avec le clavier 
 slack_entry.insert(0, "0")    #Valeur par défaut 
 slack_entry.pack()    # Disposition dans le cadre de control 
 
