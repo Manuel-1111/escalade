@@ -51,15 +51,17 @@ fig_vitesse, ax_vitesse = plt.subplots()    #Tracer les axes du graphique
 canvas_vitesse = FigureCanvasTkAgg(fig_vitesse, master=frame_left)    #Convertir les résultats en widgets Tkinter
 canvas_vitesse.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)     #Mettre le graphique sur la fenêtre Tkinter
 
-#cadre de l'animation
-fig_anim, ax_anim = plt.subplots()    #Tracer les axes du graphique
-canvas_anim = FigureCanvasTkAgg(fig_anim, master=root)    #Convertir les résultats en widgets Tkinter principal
-canvas_anim.get_tk_widget().pack(side=tk.LEFT, fill=tk.BOTH, expand=1)    # #Mettre le graphique sur la fenêtre Tkinter
-
 #graphique de la force
 fig_force, ax_force = plt.subplots()    #Tracer les axes du graphique
-canvas_force = FigureCanvasTkAgg(fig_force, master=frame_right)    #Convertir les résultats en widgets Tkinter principal
+canvas_force = FigureCanvasTkAgg(fig_force, master=frame_right)    #Convertir les résultats en widgets Tkinter
 canvas_force.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)    #Mettre le graphique sur la fenêtre Tkinter
+
+
+#cadre de l'animation
+fig_anim, ax_anim = plt.subplots()    #Tracer les axes du graphique
+canvas_anim = FigureCanvasTkAgg(fig_anim, master=root)    #Convertir les résultats en widgets Tkinter
+canvas_anim.get_tk_widget().pack(side=tk.LEFT, fill=tk.BOTH, expand=1)    # #Mettre le graphique sur la fenêtre Tkinter
+
 
 # Charger l'image de fond
 background_image = plt.imread('mur_escalade.jpg')    #Permet de mettre un foud d'écran à l'animation
