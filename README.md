@@ -9,7 +9,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg    #Pour mettre 
 import matplotlib.animation as animation     #Permet de faire des animations
 
 # --- Création de la Fenêtre principale ---
-root = tk.Tk()     # Créer une machine permettant de supporter différents graphiques 
+root = tk.Tk()     # Crée une machine permettant de supporter différents graphiques 
 root.title("Simulation de chute en escalade")     #Titre de la fenêtre
 
 # --- Cadre de contrôle gris (en haut) ---
