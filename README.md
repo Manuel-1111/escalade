@@ -20,7 +20,7 @@ frame_controls.pack(side=tk.TOP, pady=10, fill='x') # affichage du cadre
 
 tk.Label(frame_controls, text='Masse du grimpeur (kg)',bg="#add8e6").pack()    # Titre de la boite "spinbox" 
 choixmasse = tk.Spinbox(frame_controls, from_=50, to=150, increment=0.5, width=5)    #choix de la masse avec un incrément de 0.5kg / dimension et placement de la boite 
-choixmasse.pack() # disposition de la boite dans la fenetre 
+choixmasse.pack()
 
     # Ajout dans le cadre d'un menu où l'utilisateur choisit la longueur de la corde
 tk.Label(frame_controls, text='Longueur de la corde à partir de la dernière dégaine (m)',bg="#add8e6").pack()     # Titre de la boite "spinbox" 
@@ -31,7 +31,7 @@ longueurcorde.pack()
 tk.Label(frame_controls, text='Corde supplémentaire/mou (m)', bg="#add8e6").pack()    # Titre de la boite "spinbox" 
 slack_entry = tk.Entry(frame_controls)    #Entrée par l'utilisateur de la longueur du mou avec le clavier 
 slack_entry.insert(0, "0")    #Valeur par défaut 
-slack_entry.pack()    # Disposition dans le cadre de control 
+slack_entry.pack()  
 
 # --- Cadres pour affichage des graphiques ---
 frame_left = tk.Frame(root)     #Créer des cadres pour les graphique dans l'interface sur la gauche de celle-ci
