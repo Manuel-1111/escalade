@@ -95,7 +95,7 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
         while t < Tmax:    # tant que le temps est inférieur à la durée totale de la simulation :
             y_ancrage = mouvement_point_fixe(t, L0) if mouvement_point_fixe else 0 #Place le point d'ancrage sur les assureurs (fixes ou mobiles)
             
-            extension = y - y_ancrage - L0_effectif    #Extension de la corde par rapport à sa longueur à vide
+            extension = y - y_ancrage - L0_effectif - mou   #Extension de la corde par rapport à sa longueur à vide
     
             F_spring = -k * extension if extension > 0 else 0    #Force de rappel de la corde
             F_damping = -b * v if extension > 0 else 0    #Force d'amortissement modélisée par un frottement fluide
