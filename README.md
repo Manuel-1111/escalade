@@ -213,7 +213,7 @@ def start_animation(ax_pos, canvas_pos, ax_vitesse, canvas_vitesse, ax_anim, ax_
 
     n_frames = len(positions_a)    # nombre total d'images dans l'animation = nombre de valeurs dans nos listes
 
-    # FOnction qui arrête l'animation lorsque le temps défnit est écoulé
+    # Fonction qui arrête l'animation lorsque le temps défnit est écoulé
     def update(frame):
         if frame >= n_frames:
             return []
